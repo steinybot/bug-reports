@@ -1,3 +1,3 @@
 # Bug Reports
 
-This repository contains various reproductions of bugs for bug reports.
+Bug report for https://github.com/scalameta/scalafmt/issues/1640
