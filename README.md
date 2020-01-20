@@ -1,3 +1,3 @@
 # Bug Reports
 
-This repository contains various reproductions of bugs for bug reports.
+This reproduces the bug for https://github.com/cb372/sbt-explicit-dependencies/issues/46.
