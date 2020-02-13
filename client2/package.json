@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "start": "node dist/test.js"
+  },
+  "dependencies": {
+    "google-protobuf": "^3.7.2",
+    "grpc-web": "^1.0.7"
+  },
+  "devDependencies": {
+    "@types/google-protobuf": "^3.7.2"
+  }
+}
