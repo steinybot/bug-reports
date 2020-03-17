@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "start": "node dist/test.js"
+    "start": "node dist/test.js",
+    "build": "tsc --traceResolution"
   },
   "dependencies": {
     "google-protobuf": "^3.7.2",
