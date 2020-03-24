@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+patchesJson6902:
+  - target:
+      version: v1
+      kind: Service
+      namespace: lightbend-console
+      name: lightbend-console-api
+    path: patches/api-node-port.yaml
