@@ -5,5 +5,5 @@ patchesJson6902:
       version: v1
       kind: Service
       namespace: lightbend-console
-      name: lightbend-console-api
-    path: patches/api-node-port.yaml
+      name: api
+    path: api-node-port.yaml

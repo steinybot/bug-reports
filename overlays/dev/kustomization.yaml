@@ -3,6 +3,6 @@ kind: Kustomization
 namespace: lightbend-console
 bases:
   - ../common
-  - ../common/node-ports
+  - ../node-ports
 commonLabels:
   variant: dev
