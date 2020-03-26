@@ -4,7 +4,6 @@ resources:
   - configmap.yaml
 patchesJson6902:
   - target:
-      group: core
       version: v1
       kind: ConfigMap
       name: config
