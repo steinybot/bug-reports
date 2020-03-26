@@ -1,8 +1,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: foo-dev
+namespace: foo-test
 bases:
   - ../../base
   - ../common/node-port
+  - ../common/service-port
 commonLabels:
-  variant: dev
+  variant: test
