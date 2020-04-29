@@ -1,0 +1,29 @@
+import com.example.gradle.GoodDeploymentPlugin1
+import com.example.gradle.BadDeploymentPlugin1
+
+apply plugin: GoodDeploymentPlugin1
+apply plugin: BadDeploymentPlugin1
+
+wrapper {
+    gradleVersion = '5.4.1'
+    distributionType = Wrapper.DistributionType.ALL
+}
+
+goodDeployments1 {
+    servers {
+        aws {
+            url = 'http://aws.address'
+        }
+    }
+}
+
+// Fails with:
+//  Could not find method badDeployments1() for arguments [build_afudfj5pxfy9w4tkoowa6djon$_run_closure3@67f597c6] on
+//  root project 'gradle-nested-doc-bug' of type org.gradle.api.Project.
+badDeployments1 {
+    servers {
+        aws {
+            url = 'http://aws.address'
+        }
+    }
+}
