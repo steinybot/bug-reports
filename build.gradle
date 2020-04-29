@@ -1,0 +1,64 @@
+apply plugin: com.example.gradle.DeploymentPlugin
+apply plugin: com.example.gradle.DeploymentPlugin2
+
+wrapper {
+    gradleVersion = '5.4.1'
+    distributionType = Wrapper.DistributionType.ALL
+}
+
+deployments {
+    aws {
+        url = 'http://aws.address'
+
+        nodes {
+            node1 {
+                port = 9000
+            }
+            node2 {
+                port = 80
+            }
+        }
+    }
+
+    cf {
+        url = 'http://cf.address'
+
+        nodes {
+            test {
+                port = 10001
+            }
+            acceptanceTest {
+                port = 10002
+            }
+        }
+    }
+}
+
+deployments2 {
+    aws {
+        url = 'http://aws.address'
+
+        nodes {
+            node1 {
+                port = 9000
+            }
+            node2 {
+                port = 80
+            }
+        }
+    }
+
+    cf2 {
+        url = 'http://cf.address'
+
+        nodes {
+            test {
+                port = 10001
+            }
+            acceptanceTest {
+                port = 10002
+            }
+        }
+    }
+}
+
