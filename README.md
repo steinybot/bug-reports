@@ -4,3 +4,10 @@
 > Checkout the branch that relates to the specific bug.
 
 This reproduces the bug for TODO.
+
+## Steps to Reproduce
+
+```shell
+yarn install
+yarn run lint
+```
