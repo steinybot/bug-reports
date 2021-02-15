@@ -1,0 +1,30 @@
+{
+  "name": "bug-reports",
+  "version": "1.0.0",
+  "description": "> ⚠️ If you were linked to this repository from a bug report then you are on the wrong branch. > Checkout the branch that relates to the specific bug.",
+  "main": "index.js",
+  "scripts": {
+    "serve": "webpack serve",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/steinybot/bug-reports.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/steinybot/bug-reports/issues"
+  },
+  "homepage": "https://github.com/steinybot/bug-reports#readme",
+  "dependencies": {
+    "source-map": "^0.7.3"
+  },
+  "devDependencies": {
+    "html-webpack-plugin": "^5.1.0",
+    "webpack": "^5.21.2",
+    "webpack-cli": "^4.5.0",
+    "webpack-dev-server": "^3.11.2"
+  }
+}
