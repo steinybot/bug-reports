@@ -1,4 +1,4 @@
-Compile / compile / sourceDirectories := allSourceDirectories.value
+sourceDirectories := allSourceDirectories.value
 
 lazy val allSourceDirectories = Def.setting {
   val c = configuration.value
