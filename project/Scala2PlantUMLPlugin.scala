@@ -4,9 +4,6 @@ import sbt.{Def, _}
 
 object Scala2PlantUMLPlugin extends AutoPlugin {
 
-  override def trigger  = allRequirements
-  override def requires = SemanticdbPlugin
-
   object autoImport {
     val scala2PlantUML = inputKey[Unit]("Generates a PlantUML class diagram from a base symbol.")
   }
@@ -19,14 +16,11 @@ object Scala2PlantUMLPlugin extends AutoPlugin {
   )
 
   override def projectSettings: Seq[Def.Setting[_]] =
-    inConfig(Compile)(baseSettings) ++
-      inConfig(Test)(baseSettings)
+    inConfig(Compile)(baseSettings)
 
   private def allSourceDirectories =
     Def.setting {
-      val c = configuration.value
-      val dirs = sourceDirectories.all(ScopeFilter(inDependencies(ThisProject), inConfigurations(c))).value
-      val base = (ThisBuild / baseDirectory).value
-      dirs.flatten.flatMap(_.relativeTo(base))
+      val _ = configuration.value
+      Seq.empty
     }
 }
