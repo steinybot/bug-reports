@@ -1,8 +1,4 @@
-val baseSettings = Seq(
-  compile / sourceDirectories := allSourceDirectories.value
-)
-
-inConfig(Compile)(baseSettings)
+Compile / compile / sourceDirectories := allSourceDirectories.value
 
 lazy val allSourceDirectories = Def.setting {
   val c = configuration.value
