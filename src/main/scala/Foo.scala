@@ -1,1 +1,1 @@
-sealed trait Foo[Source, Data, Result]
+sealed trait Foo[A]
