@@ -4,3 +4,7 @@
 > Checkout the branch that relates to the specific bug.
 
 This reproduces the bug for TODO.
+
+# Steps to Reproduce
+
+1. `sbt fooJS/fullLinkJS`
