@@ -1,1 +1,3 @@
-scalaVersion := "2.13.1"
+enablePlugins(ScalaJSPlugin)
+scalaVersion := "2.13.5"
+scalaJSUseMainModuleInitializer := true
