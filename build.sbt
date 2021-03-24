@@ -1,1 +1,3 @@
-scalaVersion := "2.13.1"
+lazy val boom = taskKey[Unit]("Blow up.")
+
+boom := { throw new RuntimeException("Kaboom!") }
