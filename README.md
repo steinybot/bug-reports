@@ -7,6 +7,13 @@ This reproduces the bug for TODO.
 
 ## Steps to Reproduce
 
-1.
-1.
-1.
+1. Run:
+   
+   ```shell
+   sbt run
+   ```
+   
+   > ℹ️ Note that it runs successfully and prints `5`.
+
+1. Import into IntelliJ as an sbt project.
+1. Run the `Main` class.
