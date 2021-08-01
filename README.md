@@ -1,12 +1,10 @@
 # Bug Reports
 
-> ⚠️ If you were linked to this repository from a bug report then you are on the wrong branch.
-> Checkout the branch that relates to the specific bug.
-
-This reproduces the bug for TODO.
+This reproduces the bug for https://github.com/shadaj/slinky/issues/496.
 
 ## Steps to Reproduce
 
-1.
-1.
-1.
+1. Run `sbt dev`.
+2. Open http://localhost:9090.
+3. Open the console.
+4. Click the button.
