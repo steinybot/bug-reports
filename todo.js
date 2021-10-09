@@ -1,2 +1,2 @@
-import htmlFile from '/todo.html?url';
+import htmlFile from '/public/todo.html?url';
 console.log(htmlFile);
