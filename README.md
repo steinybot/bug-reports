@@ -32,14 +32,14 @@ exception when typing Main.this.FunctionalComponent.apply({
 not enough arguments for method apply: (fn: Function1, name: Main.FunctionalComponentName): Object in object FunctionalComponent.
 Unspecified value parameter name. in file /Users/jason/source/bug-reports/src/main/scala/Main.scala
 scala.reflect.internal.Types$TypeError: not enough arguments for method apply: (fn: Function1, name: Main.FunctionalComponentName): Object in object FunctionalComponent.
-Unspecified value parameter name.mpileIncremental 2s
+Unspecified value parameter name.mpileIncremental 1s
 [error]
 [error]   unrecoverable error
 [error]      while compiling: /Users/jason/source/bug-reports/src/main/scala/Main.scala
 [error]         during phase: globalPhase=erasure, enteringPhase=posterasure
-[error]      library version: version 2.13.6
-[error]     compiler version: version 2.13.6
-[error]   reconstructed args: -bootclasspath /Users/jason/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.6/scala-library-2.13.6.jar -classpath /Users/jason/source/bug-reports/target/scala-2.13/classes
+[error]      library version: version 2.13.7
+[error]     compiler version: version 2.13.7
+[error]   reconstructed args: -bootclasspath /Users/jason/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.7/scala-library-2.13.7.jar -classpath /Users/jason/source/bug-reports/target/scala-2.13/classes
 [error]
 [error]   last tree to typer: Function(value $anonfun)
 [error]        tree position: line 32 of /Users/jason/source/bug-reports/src/main/scala/Main.scala
@@ -193,9 +193,9 @@ exception when typing package <empty> {
 [error]   unrecoverable error
 [error]      while compiling: /Users/jason/source/bug-reports/src/main/scala/Main.scala
 [error]         during phase: globalPhase=erasure, enteringPhase=posterasure
-[error]      library version: version 2.13.6
-[error]     compiler version: version 2.13.6
-[error]   reconstructed args: -bootclasspath /Users/jason/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.6/scala-library-2.13.6.jar -classpath /Users/jason/source/bug-reports/target/scala-2.13/classes
+[error]      library version: version 2.13.7
+[error]     compiler version: version 2.13.7
+[error]   reconstructed args: -bootclasspath /Users/jason/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.7/scala-library-2.13.7.jar -classpath /Users/jason/source/bug-reports/target/scala-2.13/classes
 [error]
 [error]   last tree to typer: Function(value $anonfun)
 [error]        tree position: line 32 of /Users/jason/source/bug-reports/src/main/scala/Main.scala
@@ -240,16 +240,16 @@ exception when typing package <empty> {
 [error] scala.tools.nsc.typechecker.Typers$Typer.typed1(Typers.scala:5954)
 [error] scala.tools.nsc.transform.Erasure$Eraser.typed1(Erasure.scala:806)
 [error] scala.tools.nsc.typechecker.Typers$Typer.typed(Typers.scala:6041)
-[error] scala.tools.nsc.transform.Erasure$ErasureTransformer.$anonfun$transform$2(Erasure.scala:1380)
-[error] scala.tools.nsc.transform.Erasure$ErasureTransformer.transform(Erasure.scala:1380)
+[error] scala.tools.nsc.transform.Erasure$ErasureTransformer.$anonfun$transform$2(Erasure.scala:1379)
+[error] scala.tools.nsc.transform.Erasure$ErasureTransformer.transform(Erasure.scala:1379)
 [error] scala.tools.nsc.ast.Trees$Transformer.transformUnit(Trees.scala:183)
 [error] scala.tools.nsc.transform.Transform$Phase.apply(Transform.scala:32)
-[error] scala.tools.nsc.Global$GlobalPhase.applyPhase(Global.scala:454)
-[error] scala.tools.nsc.Global$GlobalPhase.run(Global.scala:401)
-[error] scala.tools.nsc.Global$Run.compileUnitsInternal(Global.scala:1519)
-[error] scala.tools.nsc.Global$Run.compileUnits(Global.scala:1503)
-[error] scala.tools.nsc.Global$Run.compileSources(Global.scala:1495)
-[error] scala.tools.nsc.Global$Run.compileFiles(Global.scala:1609)
+[error] scala.tools.nsc.Global$GlobalPhase.applyPhase(Global.scala:459)
+[error] scala.tools.nsc.Global$GlobalPhase.run(Global.scala:406)
+[error] scala.tools.nsc.Global$Run.compileUnitsInternal(Global.scala:1524)
+[error] scala.tools.nsc.Global$Run.compileUnits(Global.scala:1508)
+[error] scala.tools.nsc.Global$Run.compileSources(Global.scala:1500)
+[error] scala.tools.nsc.Global$Run.compileFiles(Global.scala:1613)
 [error] xsbt.CachedCompiler0.run(CompilerBridge.scala:163)
 [error] xsbt.CachedCompiler0.run(CompilerBridge.scala:134)
 [error] xsbt.CompilerBridge.run(CompilerBridge.scala:39)
@@ -307,9 +307,9 @@ exception when typing package <empty> {
 [error]   unrecoverable error
 [error]      while compiling: /Users/jason/source/bug-reports/src/main/scala/Main.scala
 [error]         during phase: globalPhase=erasure, enteringPhase=posterasure
-[error]      library version: version 2.13.6
-[error]     compiler version: version 2.13.6
-[error]   reconstructed args: -bootclasspath /Users/jason/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.6/scala-library-2.13.6.jar -classpath /Users/jason/source/bug-reports/target/scala-2.13/classes
+[error]      library version: version 2.13.7
+[error]     compiler version: version 2.13.7
+[error]   reconstructed args: -bootclasspath /Users/jason/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.7/scala-library-2.13.7.jar -classpath /Users/jason/source/bug-reports/target/scala-2.13/classes
 [error]
 [error]   last tree to typer: Function(value $anonfun)
 [error]        tree position: line 32 of /Users/jason/source/bug-reports/src/main/scala/Main.scala
@@ -354,16 +354,16 @@ exception when typing package <empty> {
 [error] 	at scala.tools.nsc.typechecker.Typers$Typer.typed1(Typers.scala:5954)
 [error] 	at scala.tools.nsc.transform.Erasure$Eraser.typed1(Erasure.scala:806)
 [error] 	at scala.tools.nsc.typechecker.Typers$Typer.typed(Typers.scala:6041)
-[error] 	at scala.tools.nsc.transform.Erasure$ErasureTransformer.$anonfun$transform$2(Erasure.scala:1380)
-[error] 	at scala.tools.nsc.transform.Erasure$ErasureTransformer.transform(Erasure.scala:1380)
+[error] 	at scala.tools.nsc.transform.Erasure$ErasureTransformer.$anonfun$transform$2(Erasure.scala:1379)
+[error] 	at scala.tools.nsc.transform.Erasure$ErasureTransformer.transform(Erasure.scala:1379)
 [error] 	at scala.tools.nsc.ast.Trees$Transformer.transformUnit(Trees.scala:183)
 [error] 	at scala.tools.nsc.transform.Transform$Phase.apply(Transform.scala:32)
-[error] 	at scala.tools.nsc.Global$GlobalPhase.applyPhase(Global.scala:454)
-[error] 	at scala.tools.nsc.Global$GlobalPhase.run(Global.scala:401)
-[error] 	at scala.tools.nsc.Global$Run.compileUnitsInternal(Global.scala:1519)
-[error] 	at scala.tools.nsc.Global$Run.compileUnits(Global.scala:1503)
-[error] 	at scala.tools.nsc.Global$Run.compileSources(Global.scala:1495)
-[error] 	at scala.tools.nsc.Global$Run.compileFiles(Global.scala:1609)
+[error] 	at scala.tools.nsc.Global$GlobalPhase.applyPhase(Global.scala:459)
+[error] 	at scala.tools.nsc.Global$GlobalPhase.run(Global.scala:406)
+[error] 	at scala.tools.nsc.Global$Run.compileUnitsInternal(Global.scala:1524)
+[error] 	at scala.tools.nsc.Global$Run.compileUnits(Global.scala:1508)
+[error] 	at scala.tools.nsc.Global$Run.compileSources(Global.scala:1500)
+[error] 	at scala.tools.nsc.Global$Run.compileFiles(Global.scala:1613)
 [error] 	at xsbt.CachedCompiler0.run(CompilerBridge.scala:163)
 [error] 	at xsbt.CachedCompiler0.run(CompilerBridge.scala:134)
 [error] 	at xsbt.CompilerBridge.run(CompilerBridge.scala:39)
@@ -420,9 +420,9 @@ exception when typing package <empty> {
 [error]   unrecoverable error
 [error]      while compiling: /Users/jason/source/bug-reports/src/main/scala/Main.scala
 [error]         during phase: globalPhase=erasure, enteringPhase=posterasure
-[error]      library version: version 2.13.6
-[error]     compiler version: version 2.13.6
-[error]   reconstructed args: -bootclasspath /Users/jason/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.6/scala-library-2.13.6.jar -classpath /Users/jason/source/bug-reports/target/scala-2.13/classes
+[error]      library version: version 2.13.7
+[error]     compiler version: version 2.13.7
+[error]   reconstructed args: -bootclasspath /Users/jason/Library/Caches/Coursier/v1/https/repo1.maven.org/maven2/org/scala-lang/scala-library/2.13.7/scala-library-2.13.7.jar -classpath /Users/jason/source/bug-reports/target/scala-2.13/classes
 [error]
 [error]   last tree to typer: Function(value $anonfun)
 [error]        tree position: line 32 of /Users/jason/source/bug-reports/src/main/scala/Main.scala
@@ -442,5 +442,5 @@ exception when typing package <empty> {
 [error]     33     )
 [error]     34   }
 [error]     35
-[error] Total time: 3 s, completed 3/11/2021, 7:48:13 PM
+[error] Total time: 3 s, completed 3/11/2021, 8:15:05 PM
 ```
