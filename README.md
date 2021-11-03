@@ -1,6 +1,6 @@
 # Bug Reports
 
-This reproduces the bug for TODO.
+This reproduces the bug for https://github.com/scala/bug/issues/12480.
 
 ## Steps to Reproduce
 
