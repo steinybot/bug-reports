@@ -10,5 +10,5 @@ lazy val client = project
   .settings(
     addCompilerPlugin("org.augustjune" %% "context-applied" % "0.1.4"),
     libraryDependencies += "me.shadaj" %%% "slinky-core" % "0.6.8",
-    scalacOptions ++= Seq("-Werror", "-Xlint:unused", "-Ymacro-annotations")
+    scalacOptions ++= Seq("-Werror", "-Xlint:unused", "-Ymacro-annotations", "-Ymacro-debug-lite")
   )
