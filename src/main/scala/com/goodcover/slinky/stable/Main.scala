@@ -8,14 +8,14 @@ sealed trait ImplicitlyStable[-A, +B]
 
 object ImplicitlyStable {
 
-  @inline implicit def convertibleToStable[A, B](implicit
-                                                 @unused aToB: A => B,
-                                                 @unused bToB: ImplicitlyStable[B, B],
+  implicit def convertibleToStable[A, B](implicit
+                                                 aToB: A => B,
+                                                 bToB: ImplicitlyStable[B, B],
                                                 ): ImplicitlyStable[A, B] = ???
 }
 
 object Test {
 
-  @inline def testConvertibleToStable[A, B](implicit aToB: A => B, @unused bToB: ImplicitlyStable[B, B]): ImplicitlyStable[A, B] =
+  def testConvertibleToStable[A, B](implicit aToB: A => B, bToB: ImplicitlyStable[B, B]): ImplicitlyStable[A, B] =
     implicitly
 }
