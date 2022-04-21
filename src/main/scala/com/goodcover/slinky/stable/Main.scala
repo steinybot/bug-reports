@@ -10,7 +10,7 @@ object ImplicitlyStable {
 
   implicit def convertibleToStable[A, B](implicit
                                                  aToB: A => B,
-                                                 bToB: ImplicitlyStable[B, B],
+                                                 bToB: ImplicitlyStable[B, B]
                                                 ): ImplicitlyStable[A, B] = ???
 }
 
