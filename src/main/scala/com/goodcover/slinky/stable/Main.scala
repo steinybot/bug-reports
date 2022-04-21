@@ -1,7 +1,5 @@
 package com.goodcover.slinky.stable
 
-import scala.annotation.unused
-
 final case class Stable[+A] private(unwrap: A)
 
 sealed trait ImplicitlyStable[-A, +B]
