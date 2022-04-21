@@ -4,9 +4,7 @@ import scala.annotation.unused
 
 final case class Stable[+A] private(unwrap: A)
 
-sealed trait ImplicitlyStable[-A, +B] {
-  @inline final def apply(a: A): Stable[B] = a.asInstanceOf[Stable[B]]
-}
+sealed trait ImplicitlyStable[-A, +B]
 
 object ImplicitlyStable {
 
