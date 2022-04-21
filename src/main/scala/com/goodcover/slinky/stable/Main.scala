@@ -1,6 +1,6 @@
 package com.goodcover.slinky.stable
 
-final case class Stable[+A] private(unwrap: A)
+final case class Stable[A] private(unwrap: A)
 
 sealed trait ImplicitlyStable[-A, +B]
 
