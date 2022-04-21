@@ -16,5 +16,5 @@ object Test {
                                     aToB: A => B,
                                     bToB: ImplicitlyStable[B, B]
                                    ): ImplicitlyStable[A, B] =
-    implicitly
+    implicitly[ImplicitlyStable[A, B]]
 }
