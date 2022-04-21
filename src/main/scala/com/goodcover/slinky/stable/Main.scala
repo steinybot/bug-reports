@@ -1,6 +1,6 @@
 package com.goodcover.slinky.stable
 
-sealed trait ImplicitlyStable[-A, +B]
+sealed trait ImplicitlyStable[A, +B]
 
 object ImplicitlyStable {
 
