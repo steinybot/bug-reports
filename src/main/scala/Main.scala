@@ -1,11 +1,15 @@
 import io.estatico.newtype.macros.newsubtype
 
+import scala.scalajs.js.|
+
 object Main extends App {
 
-  @newsubtype final case class Stable[A] private (unwrap: A)
+  @newsubtype final case class Foo[A](unwrap: A)
 
-  def foo(a: Any) = a match {
-    case s: Stable[_] => true
-    case _ => false
+  @newsubtype final case class Bar[A](unwrap: A)
+
+  def which[A, B](fooOrBar: Foo[A] | Bar[B]) = fooOrBar match {
+    case _: Foo[_] => "foo"
+    case _: Bar[_] => "bar"
   }
 }
