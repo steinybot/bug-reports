@@ -7,6 +7,5 @@ This reproduces the bug for TODO.
 
 ## Steps to Reproduce
 
-1.
-1.
-1.
+1. Install https://nodejs.dev/
+2. Run: `scala suspend.sb`
