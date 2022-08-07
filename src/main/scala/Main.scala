@@ -22,11 +22,7 @@ object Foo extends js.Object {
 
 object Main extends App {
 
-  // FIXME: Ambiguous references should be ignored for native JS traits since there is no overloading in JavaScript.
-  // [error] /Users/jason/src/bug-reports/src/main/scala/Main.scala:24:7: ambiguous reference to overloaded definition,
-  // [error] both method foo in object Foo of type (barOrBaz: Baz): Unit
-  // [error] and  method foo in object Foo of type (barOrBaz: Bar): Unit
-  //Foo.foo(BarAndBaz)
+  Foo.foo(BarAndBaz)
 
   Foo.foo(BarAndBaz: Bar)
   Foo.foo(BarAndBaz: Baz)

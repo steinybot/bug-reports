@@ -7,6 +7,6 @@ This reproduces the bug for TODO.
 
 ## Steps to Reproduce
 
-1.
+1. sbt
 1.
 1.
