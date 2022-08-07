@@ -1,14 +1,16 @@
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSGlobalScope
 
-class Bar extends js.Object {
+trait Bar extends js.Object {
 
-  val bar: String = "bar"
+  val bar: String
 }
 
 trait Baz extends js.Object
 
-object BarAndBaz extends Bar with Baz
+object BarAndBaz extends Bar with Baz {
+  override val bar: String = "barbaz"
+}
 
 @js.native
 @JSGlobalScope
