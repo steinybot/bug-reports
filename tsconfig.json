@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "node",
+    // This has to be ES2019. See https://github.com/cypress-io/cypress/issues/20753
+    "target": "ES2019",
+    "types": [
+      "cypress"
+    ],
+    "typeRoots": [
+      "cypress/types"
+    ]
+  },
+  "include": [
+    "**/*.ts"
+  ]
+}
