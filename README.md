@@ -1,6 +1,6 @@
 # Bug Reports
 
-This reproduces the bug for TODO.
+This reproduces the bug for https://github.com/egoist/tsup/issues/765.
 
 ## Steps to Reproduce
 
