@@ -7,7 +7,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "tsup src/index.ts"
+    "build": "tsup"
   },
   "devDependencies": {
     "tsup": "^6.4.0"
