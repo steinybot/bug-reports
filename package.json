@@ -1,0 +1,15 @@
+{
+  "name": "bug-reports",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "repository": "git@github.com:steinybot/bug-reports.git",
+  "author": "Jason Pickens <jasonpickensnz@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "tsup src/index.ts"
+  },
+  "devDependencies": {
+    "tsup": "^6.4.0"
+  }
+}
