@@ -1,3 +1,4 @@
+import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.SetRouteVia.HistoryReplace
 import japgolly.scalajs.react.extra.router._
 import japgolly.scalajs.react.vdom.html_<^._
@@ -5,21 +6,24 @@ import org.scalajs.dom
 
 object Main {
 
+
   sealed trait MyPages
 
   case object Products extends MyPages
 
   case object AddProduct extends MyPages
 
-  case class ProductInfo(id: Option[Int]) extends MyPages
+  case class ProductInfo(id: String) extends MyPages
 
   private val routerConfig = RouterConfigDsl[MyPages].buildConfig { dsl =>
     import dsl._
 
+    val id = dsl.string("[^/]+")
+
     (emptyRule
       | staticRoute("products", Products) ~> render(<.div("Products"))
       | staticRoute("products" / "add", AddProduct) ~> render(<.div("Add Product"))
-      | dynamicRouteCT("products" / int.option.caseClass[ProductInfo]) ~> dynRender((info: ProductInfo) => <.div(s"Product ${info.id}"))
+      | (dynamicRouteCT("products" / id.caseClass[ProductInfo]) ~> dynRender((info: ProductInfo) => <.div(s"Product ${info.id}"))).addCondition(CallbackTo(true))
       ).notFound(redirectToPage(AddProduct)(HistoryReplace))
   }
 

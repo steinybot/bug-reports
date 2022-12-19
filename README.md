@@ -8,5 +8,6 @@ This reproduces the bug for TODO.
 ## Steps to Reproduce
 
 1. Run `sbt`
-1. Run the task `fastOptJS/startWebpackDevServer`
-1. Run the task `~fastOptJS`
+1. Run the sbt task `fastOptJS/startWebpackDevServer`
+1. Run the sbt task `~fastOptJS`
+1. Go to http://localhost:8081
