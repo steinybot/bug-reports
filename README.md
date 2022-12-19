@@ -7,6 +7,6 @@ This reproduces the bug for TODO.
 
 ## Steps to Reproduce
 
-1.
-1.
-1.
+1. Run `sbt`
+1. Run the task `fastOptJS/startWebpackDevServer`
+1. Run the task `~fastOptJS`
