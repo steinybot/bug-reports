@@ -22,8 +22,8 @@ object Main {
 
     (emptyRule
       | staticRoute("products", Products) ~> render(<.div("Products"))
-      | staticRoute("products" / "add", AddProduct) ~> render(<.div("Add Product"))
-      | (dynamicRouteCT("products" / id.caseClass[ProductInfo]) ~> dynRender((info: ProductInfo) => <.div(s"Product ${info.id}"))).addCondition(CallbackTo(true))
+      | (staticRoute("products" / "add", AddProduct) ~> render(<.div("Add Product"))).addCondition(CallbackTo(true))
+      | dynamicRouteCT("products" / id.caseClass[ProductInfo]) ~> dynRender((info: ProductInfo) => <.div(s"Product ${info.id}"))
       ).notFound(redirectToPage(AddProduct)(HistoryReplace))
   }
 
