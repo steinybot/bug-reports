@@ -1,26 +1,17 @@
 import slinky.core.Component
 import slinky.core.annotations.react
-import slinky.core.facade.{Fragment, ReactElement}
-
-import scala.scalajs.js
+import slinky.core.facade.ReactElement
 
 object Main extends App {
 }
 
 @react
-class ErrorBoundarySlinky extends Component {
+class MyComponent extends Component {
 
-  case class Props(fallback: js.Error => ReactElement, logIt: Boolean, children: ReactElement*)
-  case class State(error: Option[js.Error])
+  override type Props = String
+  override type State = String
 
-  override def initialState: State = State(None)
+  override def initialState: String = props
 
-  override def render(): ReactElement = {
-    state.error match {
-      case Some(value) =>
-        props.fallback(value)
-      case None        =>
-        Fragment(props.children: _*)
-    }
-  }
+  override def render(): ReactElement = state
 }

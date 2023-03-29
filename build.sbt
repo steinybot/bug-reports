@@ -1,5 +1,7 @@
 scalaVersion := "2.13.10"
 scalacOptions ++= Seq(
+  "-Wnonunit-statement",
+  "-Xfatal-warnings",
   "-Ymacro-annotations",
   "-Ymacro-debug-verbose"
 )
