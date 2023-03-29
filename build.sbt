@@ -1,4 +1,10 @@
 scalaVersion := "2.13.10"
-scalacOptions += "-Wvalue-discard"
-scalacOptions += "-Wnonunit-statement"
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.15" % Test
+scalacOptions ++= Seq(
+  "-Ymacro-annotations",
+  "-Ymacro-debug-verbose"
+)
+
+enablePlugins(ScalaJSPlugin)
+scalaJSUseMainModuleInitializer := true
+
+libraryDependencies += "me.shadaj" %%% "slinky-core" % "0.7.3"

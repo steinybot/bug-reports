@@ -1,10 +1,26 @@
+import slinky.core.Component
+import slinky.core.annotations.react
+import slinky.core.facade.{Fragment, ReactElement}
+
+import scala.scalajs.js
+
 object Main extends App {
-  def foo(a: String): String = a
-  def foo(a: Int)(implicit ordering: Ordering[Int]): String = a.toString
+}
 
-  def bar(): Unit = foo("abc"): Unit
+@react
+class ErrorBoundarySlinky extends Component {
 
-  bar()
+  case class Props(fallback: js.Error => ReactElement, logIt: Boolean, children: ReactElement*)
+  case class State(error: Option[js.Error])
 
-  foo("def"): Unit
+  override def initialState: State = State(None)
+
+  override def render(): ReactElement = {
+    state.error match {
+      case Some(value) =>
+        props.fallback(value)
+      case None        =>
+        Fragment(props.children: _*)
+    }
+  }
 }
