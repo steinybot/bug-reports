@@ -5,26 +5,34 @@ trait WithSelf {
   type Self
 }
 
-case class Demo(firstName: String, age: Int)
+case class Person(firstName: String, age: Int)
 
-object Demo {
+object Person {
 
   type Data = WithSelf {
     val firstName: String
     def withFirstName(value: String): Self
+    val age: Int
+    def withAge(value: Int): Self
   }
 
-  private case class DemoData(firstName: String, age: Int) extends WithSelf {
-    type Self = DemoData
-    def withFirstName(value: String): Demo = Demo(value, age)
+  case class DataImpl(firstName: String, age: Int) extends WithSelf {
+    type Self = DataImpl
+    def withFirstName(value: String): Self = copy(firstName = value)
+    def withAge(value: Int): Self = copy(age = value)
   }
 
-  def data(demo: Demo): Data = DemoData(demo.firstName, demo.age).asInstanceOf[Data]
+  def data(person: Person): Data = DataImpl(person.firstName, person.age).asInstanceOf[Data]
 }
 
 object Main extends App {
-  val demo = Demo("Bob", 69)
-  val demoData = Demo.data(demo)
-  println(demoData.firstName)
-  println(demoData.withFirstName("Jim"))
+  val alice = Person("Alice", 21)
+
+  val aliceData = Person.data(alice)
+  println(aliceData.firstName)
+  println(aliceData.withFirstName("Claire"))
+
+  val bobData = Person.DataImpl("Bob", 34)
+  println(bobData.firstName)
+  println(bobData.withFirstName("Dave"))
 }
