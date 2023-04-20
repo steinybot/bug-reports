@@ -26,13 +26,13 @@ object Person {
 }
 
 object Main extends App {
-  val alice = Person("Alice", 21)
+  // This does not work.
+  val alice = Person.data(Person("Alice", 21))
+  println(alice.firstName)
+  println(alice.withFirstName("Claire"))
 
-  val aliceData = Person.data(alice)
-  println(aliceData.firstName)
-  println(aliceData.withFirstName("Claire"))
-
-  val bobData = Person.DataImpl("Bob", 34)
-  println(bobData.firstName)
-  println(bobData.withFirstName("Dave"))
+  // This works fine.
+  val bob = Person.DataImpl("Bob", 34)
+  println(bob.firstName)
+  println(bob.withFirstName("Dave"))
 }
