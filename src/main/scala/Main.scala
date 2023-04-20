@@ -22,7 +22,7 @@ object Person {
     def withAge(value: Int): Self = copy(age = value)
   }
 
-  def data(person: Person): Data = DataImpl(person.firstName, person.age).asInstanceOf[Data]
+  def data(person: Person): Data = DataImpl(person.firstName, person.age)
 }
 
 object Main extends App {
