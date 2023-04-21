@@ -6,8 +6,10 @@ import scala.quoted.*
 transparent inline def data[T](source: T) =
   ${ dataImpl[T]('source) }
 
-private def refinedTypeWithDataMethods[Labels <: Tuple: Type, Types <: Tuple: Type](using Quotes): quotes.reflect.TypeRepr =
-  import quotes.reflect.*
+private def dataRefinementType[Labels <: Tuple: Type, Types <: Tuple: Type](using Quotes): quotes.reflect.TypeRepr =
+  val quotesTyped: Quotes = quotes
+  import quotesTyped.reflect.*
+
   @tailrec
   def loop[Labels <: Tuple: Type, Types <: Tuple: Type](result: RecursiveType): TypeRepr =
     Type.of[Labels] match {
@@ -30,8 +32,34 @@ private def refinedTypeWithDataMethods[Labels <: Tuple: Type, Types <: Tuple: Ty
     }
   loop[Labels, Types](RecursiveType(_ => TypeRepr.of[Any]))
 
+private def dataCaseClass[Labels <: Tuple: Type, Types <: Tuple: Type](using Quotes): quotes.reflect.ClassDef =
+  val quotesTyped: Quotes = quotes
+  import quotesTyped.reflect.*
+
+  val name = Symbol.freshName("Data")
+  // TODO: Copy the parents including the source type itself (if applicable).
+  val parents = List(TypeRepr.of[Object])
+  val cls = Symbol.newClass(Symbol.spliceOwner, name, parents, decls, selfType = None)
+
+  @tailrec
+  def loop[Labels <: Tuple: Type, Types <: Tuple: Type](result: List[Statement]): List[Statement] =
+    Type.of[Labels] match {
+      case '[EmptyTuple] => result
+      case '[tLabel *: tLabelTail] =>
+        Type.of[Types] match {
+          case '[EmptyTuple] => result
+          case '[tpe *: tpeTail] =>
+            val label: String = Type.valueOfConstant[tLabel].get.toString
+            val tpeRepr = TypeRepr.of[tpe]
+
+        }
+    }
+  val body = loop[Labels, Types](RecursiveType(_ => TypeRepr.of[Any]))
+  ClassDef(cls, parents, body)
+
 private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
-  import quotes.reflect.*
+  val quotesTyped: Quotes = quotes
+  import quotesTyped.reflect.*
 
   Expr.summon[Mirror.ProductOf[T]].get match
     case '{
@@ -43,16 +71,18 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
       }
     } =>
       TypeRepr.of[String].asType
-      val x: quotes.reflect.TypeRepr = refinedTypeWithDataMethods[mels, mets]
+      val x: TypeRepr = dataRefinementType[mels, mets]
       println(x.show)
       val z: Type[?] = x.asType
       z match {
         case '[z] =>
+          val dataSymbol = Symbol.newClass()
+          val data = ClassDef()
           '{
-            class Data {
-
+            case class Data(name: String) {
+              def withName(value: String) = copy(name = value)
             }
-            (new Data).asInstanceOf[z]
+            PersonData(source.name): z
           }
       }
 
