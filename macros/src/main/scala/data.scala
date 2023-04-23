@@ -104,17 +104,27 @@ class inspect extends MacroAnnotation:
 
   private sealed trait Result
 
-  private case class TypeResult(tpe: String, subs: Vector[(String, Result)] = Vector.empty) extends Result:
-    def addSubResult(key: String, result: String*): TypeResult = {
-      if (result.isEmpty) this
-      else if (result.length == 1) copy(subs = subs :+ key -> StringResult(result.head))
-      else copy(subs = subs :+ key -> MultiResult(result.map(StringResult.apply).toList))
-    }
-    def addSubResult(key: String, result: Result): TypeResult = copy(subs = subs :+ key -> result)
-    def addSubResult(key: String, result: List[Result]): TypeResult = copy(subs = subs :+ key -> MultiResult(result))
-    def addSubResult(key: String, result: Option[Result]): TypeResult = result.fold(this)(addSubResult(key, _))
+  private object Result {
+    given Conversion[Boolean, ValueResult] = a => ValueResult(a.toString)
+    given Conversion[Byte, ValueResult] = a => ValueResult(a.toString)
+    given Conversion[Short, ValueResult] = a => ValueResult(a.toString)
+    given Conversion[Int, ValueResult] = a => ValueResult(a.toString)
+    given Conversion[Long, ValueResult] = a => ValueResult(a.toString)
+    given Conversion[Float, ValueResult] = a => ValueResult(a.toString)
+    given Conversion[Double, ValueResult] = a => ValueResult(a.toString)
+    given Conversion[Char, ValueResult] = a => ValueResult(a.toString)
+    given Conversion[String, ValueResult] = a => ValueResult(s""""$a"""")
+    given Conversion[Result, Result] = a => a
+    given optionConversion[A](using conversion: Conversion[A, Result]): Conversion[Option[A], OptionalResult] = a => OptionalResult(a.map(conversion))
+    given multiConversion[A](using conversion: Conversion[A, Result]): Conversion[List[A], MultiResult] = a => MultiResult(a.map(conversion))
+  }
 
-  private case class StringResult(value: String) extends Result
+  private case class TypeResult(tpe: String, subs: Vector[(String, Result)] = Vector.empty) extends Result:
+    def addSubResult[A](key: String, result: A)(using Conversion[A, Result]): TypeResult = copy(subs = subs :+ key -> result)
+
+  private case class ValueResult(value: String) extends Result
+
+  private case class OptionalResult(value: Option[Result]) extends Result
 
   private case class MultiResult(results: List[Result]) extends Result
 
@@ -203,22 +213,22 @@ class inspect extends MacroAnnotation:
           .addSubResult("underlying", traverseTypeRepr(underlying))
       case MethodType(paramNames, paramInfos, resultType) =>
         TypeResult("MethodType")
-          .addSubResult("paramNames", paramNames: _*)
+          .addSubResult("paramNames", paramNames)
           .addSubResult("paramInfos", paramInfos.map(traverseTypeRepr))
           .addSubResult("resultType", traverseTypeRepr(resultType))
       case PolyType(paramNames, paramBounds, resultType) =>
         TypeResult("PolyType")
-          .addSubResult("paramNames", paramNames: _*)
+          .addSubResult("paramNames", paramNames)
           .addSubResult("paramBounds", paramBounds.map(traverseTypeRepr))
           .addSubResult("resultType", traverseTypeRepr(resultType))
       case TypeLambda(paramNames, bounds, body) =>
         TypeResult("TypeLambda")
-          .addSubResult("paramNames", paramNames: _*)
+          .addSubResult("paramNames", paramNames)
           .addSubResult("bounds", bounds.map(traverseTypeRepr))
           .addSubResult("body", traverseTypeRepr(body))
       case lambdaType: LambdaType =>
         TypeResult("LambdaType")
-          .addSubResult("paramNames", lambdaType.paramNames: _*)
+          .addSubResult("paramNames", lambdaType.paramNames)
           .addSubResult("paramTypes", lambdaType.paramTypes.map(traverseTypeRepr))
           .addSubResult("resType", traverseTypeRepr(lambdaType.resType))
       case MatchCase(pattern, rhs) =>
@@ -343,7 +353,7 @@ class inspect extends MacroAnnotation:
             .addSubResult("constant", traverseConstant(constant))
         case This(id) =>
           TypeResult("This")
-            .addSubResult("id", id.toSeq: _*)
+            .addSubResult("id", id)
         case New(tpt) =>
           TypeResult("New")
             .addSubResult("tpt", traverse(tpt))
@@ -362,7 +372,7 @@ class inspect extends MacroAnnotation:
         case Super(qualifier, id) =>
           TypeResult("Super")
             .addSubResult("qualifier", traverse(qualifier))
-            .addSubResult("id", id.toSeq: _*)
+            .addSubResult("id", id)
         case Assign(lhs, rhs) =>
           TypeResult("Assign")
             .addSubResult("lhs", traverse(lhs))
@@ -522,8 +532,14 @@ class inspect extends MacroAnnotation:
             display(value, level + 1)
           }
           println(s"$outdent)")
-        case StringResult(value) =>
-          println(s""""$value"""")
+        case ValueResult(value) =>
+          println(value)
+        case OptionalResult(None) =>
+          println("None")
+        case OptionalResult(Some(result)) =>
+//          Predef.print("Some(")
+          display(result, level + 1)
+//          println(")")
         case MultiResult(results) if results.isEmpty =>
           println("[]")
         case MultiResult(results) =>
