@@ -507,6 +507,33 @@ class inspect extends MacroAnnotation:
           TypeResult("WildcardTypeTree")
             .addSubResult("tpe", traverseTypeRepr(wildcard.tpe))
 
-    traverse(tree)
+    val result = traverse(tree)
+
+    def display(result: Result, level: Int): Unit =
+      val indent = " " * (2 * (level + 1))
+      val outdent = " " * (2 * level)
+      result match
+        case TypeResult(tpe, members) if members.isEmpty =>
+          println(s"$tpe()")
+        case TypeResult(tpe, members) =>
+          println(s"$tpe(")
+          members.foreach { (key, value) =>
+            Predef.print(s"$indent$key = ")
+            display(value, level + 1)
+          }
+          println(s"$outdent)")
+        case StringResult(value) =>
+          println(s""""$value"""")
+        case MultiResult(results) if results.isEmpty =>
+          println("[]")
+        case MultiResult(results) =>
+          println("[")
+          results.foreach { result =>
+            Predef.print(indent)
+            display(result, level + 1)
+          }
+          println(s"$outdent]")
+
+    display(result, 0)
 
     List(tree)
