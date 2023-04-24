@@ -1,11 +1,11 @@
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
-trait Bob[B] {}
+trait Bob[A]
 
 object MacroImpl {
 
-  def focus_impl[A, B: c.WeakTypeTag](
+  def focus_impl[A, B](
     c: blackbox.Context
   )(path: c.Expr[A => B])(bob: c.Expr[Bob[B]]): c.Expr[Unit] = {
     import c.universe._
