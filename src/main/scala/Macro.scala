@@ -1,13 +1,11 @@
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
-trait Bob[A]
+trait F[A]
 
 object MacroImpl {
 
-  def myMacroImpl(
-    c: blackbox.Context
-  )()(bob: c.Expr[Bob[_]]): c.Expr[Unit] = {
+  def myMacroImpl(c: blackbox.Context)()(bob: c.Expr[F[_]]): c.Expr[Unit] = {
     import c.universe._
     c.Expr[Unit](q"""()""")
   }
@@ -15,5 +13,5 @@ object MacroImpl {
 
 object Macro {
 
-  def myMacro[B]()(implicit bob: Bob[B]): Unit = macro MacroImpl.myMacroImpl
+  def myMacro[B]()(implicit bob: F[B]): Unit = macro MacroImpl.myMacroImpl
 }
