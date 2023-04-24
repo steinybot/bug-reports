@@ -5,9 +5,9 @@ trait Bob[A]
 
 object MacroImpl {
 
-  def focus_impl[A, B](
+  def myMacroImpl[A, B](
     c: blackbox.Context
-  )(path: c.Expr[A => B])(bob: c.Expr[Bob[B]]): c.Expr[Unit] = {
+  )()(bob: c.Expr[Bob[B]]): c.Expr[Unit] = {
     import c.universe._
 
     val subj = c.prefix.tree
@@ -25,6 +25,5 @@ final case class Slot[A] protected (
   private val _onModify: (A, A) => Unit
 ) {
 
-  /** Create a new slot by focusing down a path of sub fields. */
-  def focus[B](path: A => B)(implicit bob: Bob[B]): Slot[B] = macro MacroImpl.focus_impl[A, B]
+  def focus[B]()(implicit bob: Bob[B]): Slot[B] = macro MacroImpl.myMacroImpl[A, B]
 }
