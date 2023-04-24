@@ -25,5 +25,5 @@ final case class Slot[A] protected (
   private val _onModify: (A, A) => Unit
 ) {
 
-  def focus[B]()(implicit bob: Bob[B]): Slot[B] = macro MacroImpl.myMacroImpl[A, B]
+  def myMacro[B]()(implicit bob: Bob[B]): Slot[B] = macro MacroImpl.myMacroImpl[A, B]
 }
