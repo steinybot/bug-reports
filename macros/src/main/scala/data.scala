@@ -11,6 +11,14 @@ transparent inline def data[T](source: T) =
 private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
   val quotesTyped: Quotes = quotes
   import quotesTyped.reflect.*
+//  import quotes.reflect.*
+
+  def classDefToExpr(classDef: ClassDef): Expr[Unit] =
+//    ClassDef(name, constructor, parents, self, body) = classDef
+    val clsName = Expr(classDef.name)
+    val constructor: DefDef = classDef.constructor
+    // TODO: Finish this.
+    '{ class $clsName }
 
   type Fields = List[(String, TypeRepr)]
 
@@ -44,7 +52,7 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
     }
   end dataRefinementType
 
-  def dataCaseClass(fields: Fields): ClassDef =
+  def dataCaseClass(fields: Fields): (Symbol, ClassDef) =
     val name = Symbol.freshName("Data")
     // TODO: Copy the parents including the source type itself (if applicable).
     val parents = List(TypeTree.of[Object])
@@ -59,9 +67,11 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
 //        ValDef(fieldSym)
 //    }
     val body = List.empty[Statement]
-    ClassDef(cls, parents, body)
+    cls -> ClassDef(cls, parents, body)
   end dataCaseClass
 
+  // TODO: Remove the get
+  // TODO: Add fallback cases everywhere
   Expr.summon[Mirror.ProductOf[T]].get match
     case '{
       type mels <: Tuple
@@ -73,11 +83,19 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
     } =>
       val fields = productFields[mels, mets]
       val tpe = dataRefinementType(fields).asType
+      val (cls, clsDef) = dataCaseClass(fields)
+      val newCls = Apply(Select(New(TypeIdent(cls)), cls.primaryConstructor), Nil)
       tpe match {
         case '[data] =>
 //          val dataSymbol = Symbol.newClass()
 //          val data = ClassDef()
+          val x = '{ class $clsName }
+          println(x)
+          println(x.show)
           '{
+              ${classDefToExpr(clsDef)}
+//            ${Expr(ValDef(Symbol.newVal(Symbol.spliceOwner, "foo", TypeRepr.of[String], Flags.EmptyFlags, Symbol.noSymbol), None))}
+//            ${newCls.asExpr}
 //            case class Data(name: String) {
 //              def withName(value: String) = copy(name = value)
 //            }
