@@ -8,5 +8,5 @@ final case class Slot[A] protected (
 ) {
 
   /** Create a new slot by focusing down a path of sub fields. */
-  def focus[B](path: A => B)(implicit bob: Bob[B]): Slot[B] = macro SlotMacroImpl.focus_impl[Slot, A, B]
+  def focus[B](path: A => B)(implicit bob: Bob[B]): Slot[B] = macro MacroImpl.focus_impl[A, B]
 }
