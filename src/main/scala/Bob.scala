@@ -1,0 +1,1 @@
+trait Bob[B] {}
