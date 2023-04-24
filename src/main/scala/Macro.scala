@@ -5,9 +5,9 @@ trait Bob[A]
 
 object MacroImpl {
 
-  def myMacroImpl[B](
+  def myMacroImpl(
     c: blackbox.Context
-  )()(bob: c.Expr[Bob[B]]): c.Expr[Unit] = {
+  )()(bob: c.Expr[Bob[_]]): c.Expr[Unit] = {
     import c.universe._
     c.Expr[Unit](q"""()""")
   }
@@ -15,5 +15,5 @@ object MacroImpl {
 
 object Macro {
 
-  def myMacro[B]()(implicit bob: Bob[B]): Unit = macro MacroImpl.myMacroImpl[B]
+  def myMacro[B]()(implicit bob: Bob[B]): Unit = macro MacroImpl.myMacroImpl
 }
