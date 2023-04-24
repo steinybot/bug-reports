@@ -5,7 +5,7 @@ trait Bob[A]
 
 object MacroImpl {
 
-  def myMacroImpl[A, B](
+  def myMacroImpl[B](
     c: blackbox.Context
   )()(bob: c.Expr[Bob[B]]): c.Expr[Unit] = {
     import c.universe._
@@ -18,12 +18,7 @@ object MacroImpl {
   }
 }
 
-final case class Slot[A] protected (
-  get: A,
-  private val _modify: (A => A) => Unit,
-  private val _getNow: () => A,
-  private val _onModify: (A, A) => Unit
-) {
+object Macro {
 
-  def myMacro[B]()(implicit bob: Bob[B]): Slot[B] = macro MacroImpl.myMacroImpl[A, B]
+  def myMacro[B]()(implicit bob: Bob[B]): Unit = macro MacroImpl.myMacroImpl[B]
 }
