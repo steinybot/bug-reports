@@ -9,11 +9,6 @@ object MacroImpl {
     c: blackbox.Context
   )()(bob: c.Expr[Bob[B]]): c.Expr[Unit] = {
     import c.universe._
-
-    val subj = c.prefix.tree
-
-    val _ = bob
-
     c.Expr[Unit](q"""()""")
   }
 }
