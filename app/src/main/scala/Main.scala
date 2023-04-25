@@ -7,7 +7,9 @@ trait Blah
 @experimental
 @inspect
 object Outer {
+  class NoCtor()
   class Foo[A <: String](val name: String)(using Int) extends Blah { myself: Bloop =>
+    println("constructed")
     def yowza(i: Int): Unit = println("Yowza!" * i)
   }
 }

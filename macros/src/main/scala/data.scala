@@ -7,6 +7,8 @@ import scala.quoted.*
 transparent inline def data[T](source: T) =
   ${ dataImpl[T]('source) }
 
+private final val MaximumTypeParameters = 1
+
 @experimental
 private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
   val quotesTyped: Quotes = quotes
@@ -14,11 +16,29 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
 //  import quotes.reflect.*
 
   def classDefToExpr(classDef: ClassDef): Expr[Unit] =
-//    ClassDef(name, constructor, parents, self, body) = classDef
-    val clsName = Expr(classDef.name)
-    val constructor: DefDef = classDef.constructor
     // TODO: Finish this.
-    '{ class $clsName }
+    val ClassDef(name, constructor, parents, self, body) = classDef
+    val clsName = Expr(name)
+    // TODO: Can rhs be Some?
+    val DefDef(_, paramss, _, _) = constructor
+    // TODO: Can there be more than one type param clause? No right?
+    val maybeTypeParamClause = paramss.collectFirst {
+      case clause: TypeParamClause => clause
+    }
+    val test1: Expr[Int] = '{ 1 }
+    val test2: Expr[Expr[Int]] = '{ Expr(1) }
+    maybeTypeParamClause match {
+      case None =>
+        '{
+          class $clsName()
+        }
+      case Some(typeParamClause) => typeParamClause.params match {
+        // FIXME: This kinda sucks. How can we support an arbitrary number of type parameters and splice their names?
+        case _ :: Nil => '{ class $clsName[A]() }
+        // TODO: Add position.
+        case params => report.errorAndAbort(s"Too many type parameters. Currently able to support $MaximumTypeParameters type parameters but found ${params.length}. Please submit a Pull Request to handle more type parameters.")
+      }
+    }
 
   type Fields = List[(String, TypeRepr)]
 
