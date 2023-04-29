@@ -8,3 +8,6 @@ lazy val app = project
   .dependsOn(macros)
 
 lazy val macros = project
+  .settings(//
+    libraryDependencies += "org.scala-lang" %% "scala3-compiler" % scalaVersion.value
+  )

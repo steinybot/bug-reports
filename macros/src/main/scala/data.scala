@@ -8,6 +8,8 @@ transparent inline def data[T](source: T) =
   ${ dataImpl[T]('source) }
 
 private final val MaximumTypeParameters = 1
+private final val MaximumParameterLists = 1
+private final val MaximumParameters = 1
 
 @experimental
 private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
@@ -15,28 +17,98 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
   import quotesTyped.reflect.*
 //  import quotes.reflect.*
 
+//  implicit val context = dotty.tools.dotc.core.Contexts.ContextBase().initialCtx
+//  context.initialize()
+  val quotes2: scala.quoted.runtime.impl.QuotesImpl = quotes.asInstanceOf[scala.quoted.runtime.impl.QuotesImpl]
+  implicit val context = quotes2.ctx
+
+  inline def valDefToExpr(valDef: ValDef): Expr[Unit] =
+    val ValDef(name, tpt, rhs) = valDef
+    // TODO: Is there an easier way to extract the type?
+    tpt.tpe.asType match {
+      case '[t] =>
+        rhs match {
+          case Some(term) =>
+            '{ val $name: t = ${term.asExprOf[t]} }
+          case None =>
+            // FIXME
+            '{ val $name: t = ??? }
+        }
+    }
+
   def classDefToExpr(classDef: ClassDef): Expr[Unit] =
+    scala.quoted.runtime.impl.ExprImpl(
+      // TODO: Do we need to convert the ClassDef to a TypeDef?
+      Block(stats = List(classDef), expr = Literal(UnitConstant())).asInstanceOf[dotty.tools.dotc.ast.tpd.Tree],
+      scala.quoted.runtime.impl.SpliceScope.getCurrent
+    ).asInstanceOf[Expr[Unit]]
+
+  def classDefToExpr2(classDef: ClassDef): Expr[Unit] =
     // TODO: Finish this.
     val ClassDef(name, constructor, parents, self, body) = classDef
     val clsName = Expr(name)
     // TODO: Can rhs be Some?
     val DefDef(_, paramss, _, _) = constructor
     // TODO: Can there be more than one type param clause? No right?
-    val maybeTypeParamClause = paramss.collectFirst {
+    // I don't think these can be empty but filter it out just in case.
+    val maybeTypeParams = paramss.collectFirst {
       case clause: TypeParamClause => clause
+    }.filter(_.params.nonEmpty)
+    val termParamss = paramss.collect {
+      case clause: TermParamClause => clause
     }
-    val test1: Expr[Int] = '{ 1 }
-    val test2: Expr[Expr[Int]] = '{ Expr(1) }
-    maybeTypeParamClause match {
+
+    println("XXXX")
+
+    // HINT: Take a look at dotty.tools.dotc.typer.QuotesAndSplices
+
+//    import dotty.tools.dotc.core.Contexts._
+//    implicit val context = dotty.tools.dotc.core.Contexts.ContextBase().initialCtx
+//    context.initialize()
+    val bob = '{ class Bob }
+////    val bobTree = dotty.tools.dotc.quoted.PickledQuotes.quotedExprToTree(bob)
+//    val bobTree = bob.asInstanceOf[scala.quoted.runtime.impl.ExprImpl].tree
+////    dotty.tools.dotc.core.Definitions.init()
+//    println("XXXXX2")
+//    val pickled = dotty.tools.dotc.quoted.PickledQuotes.pickleQuote(bobTree)
+//    println(pickled)
+//    val unpickled = quotes.asInstanceOf[runtime.QuoteUnpickler].unpickleExprV2[T](
+//      pickled = pickled,
+//      types = Seq.empty,
+//      termHole = (idx: Int, args: Seq[Any], quotes: Quotes) => ???
+//    )
+//    println(unpickled)
+
+    maybeTypeParams match {
       case None =>
-        '{
-          class $clsName()
+        termParamss match {
+          // TODO: Support more param lists.
+          case Nil =>
+            '{ class $clsName }
+          case clause :: Nil => clause.params match {
+            case Nil =>
+              '{ class $clsName() }
+            case a :: Nil =>
+              // FIXME
+              val aExpr = valDefToExpr(a)
+              println(aExpr.show)
+              '{ class $clsName() }
+            case params =>
+              // TODO: Add position.
+              report.errorAndAbort(s"Too many parameters. Currently able to support $MaximumParameters parameters but found ${params.length}. Please submit an issue to support more.")
+          }
+          case _ =>
+            // TODO: Add position.
+            report.errorAndAbort(s"Too many parameter lists. Currently able to support $MaximumParameterLists parameter lists but found ${paramss.length}. Please submit an issue to support more.")
         }
-      case Some(typeParamClause) => typeParamClause.params match {
+      case Some(typeParams) => typeParams.params match {
         // FIXME: This kinda sucks. How can we support an arbitrary number of type parameters and splice their names?
-        case _ :: Nil => '{ class $clsName[A]() }
-        // TODO: Add position.
-        case params => report.errorAndAbort(s"Too many type parameters. Currently able to support $MaximumTypeParameters type parameters but found ${params.length}. Please submit a Pull Request to handle more type parameters.")
+        case _ :: Nil =>
+          // TODO: Add terms
+          '{ class $clsName[A]() }
+        case tparams =>
+          // TODO: Add position.
+          report.errorAndAbort(s"Too many type parameters. Currently able to support $MaximumTypeParameters type parameters but found ${tparams.length}. Please submit an issue to support more.")
       }
     }
 
@@ -101,6 +173,7 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
         type MirroredElemTypes = `mets`
       }
     } =>
+      val x = '{ class Bob }
       val fields = productFields[mels, mets]
       val tpe = dataRefinementType(fields).asType
       val (cls, clsDef) = dataCaseClass(fields)
@@ -109,9 +182,8 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
         case '[data] =>
 //          val dataSymbol = Symbol.newClass()
 //          val data = ClassDef()
-          val x = '{ class $clsName }
-          println(x)
-          println(x.show)
+//          println(x)
+//          println(x.show)
           '{
               ${classDefToExpr(clsDef)}
 //            ${Expr(ValDef(Symbol.newVal(Symbol.spliceOwner, "foo", TypeRepr.of[String], Flags.EmptyFlags, Symbol.noSymbol), None))}

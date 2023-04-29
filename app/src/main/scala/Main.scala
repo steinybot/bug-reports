@@ -4,8 +4,8 @@ import scala.annotation.experimental
 trait Bloop
 trait Blah
 
-@experimental
-@inspect
+//@experimental
+//@inspect
 object Outer {
   class NoCtor()
   class Foo[A <: String](val name: String)(using Int) extends Blah { myself: Bloop =>
