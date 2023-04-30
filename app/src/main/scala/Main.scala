@@ -14,6 +14,10 @@ trait Blah
 //  }
 //}
 
+type Ref = {
+  def name: String
+}
+
 //@experimental
 //@inspect
 //class Data$macro$1(source$macro$1: Person) extends java.lang.Object with scala.Selectable {
@@ -27,5 +31,8 @@ case class Person(name: String)
 
 object Main extends App {
   val alice = data(Person("Alice"))
-  println(alice.name)
+//  println(alice.name)
+
+  //new Data$macro$1(Person("Alice")).asInstanceOf[Ref].name
+//  new Data$macro$1(Person("Alice")).asInstanceOf[Ref].selectDynamic("name")
 }

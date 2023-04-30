@@ -85,17 +85,24 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
     val sourceParamName = Symbol.freshName("source")
     def decls(cls: Symbol) =
       List(
+        Symbol.newVal(cls, sourceParamName, sourceTpe, LocalParamAccessor, cls), //Symbol.noSymbol),
         Symbol.newMethod(cls, "selectDynamic", MethodType(List("name"))(_ => List(TypeRepr.of[String]), _ => TypeRepr.of[Any]))
       )
     val cls = Symbol.newClass(Symbol.spliceOwner, name, parents.map(_.tpe), decls, selfType = None)
+    // NOTE: Do not forget to put the symbol in the decls!
+    //  If you do then the code looks fine but it's not a real member and you get really confusing errors.
     val body = List[Statement](
-      ValDef( //
-        Symbol.newVal(cls, sourceParamName, sourceTpe, LocalParamAccessor, Symbol.noSymbol),
+//      ValDef( //
+//        sourceParamSym,
+//        None
+//      ).asInstanceOf[dotty.tools.dotc.ast.Trees.ValDef[_]]
+//        .withMods(dotty.tools.dotc.ast.untpd.EmptyModifiers.withFlags(LocalParamAccessor.asInstanceOf[dotty.tools.dotc.core.Flags.FlagSet]))
+//        .asInstanceOf[Statement]
+//      ,
+      ValDef(
+        cls.declaredField(sourceParamName),
         None
-      ).asInstanceOf[dotty.tools.dotc.ast.Trees.ValDef[_]]
-        .withMods(dotty.tools.dotc.ast.untpd.EmptyModifiers.withFlags(LocalParamAccessor.asInstanceOf[dotty.tools.dotc.core.Flags.FlagSet]))
-        .asInstanceOf[Statement]
-      ,
+      ),
 
       DefDef( //
         cls.methodMember("selectDynamic").head,
@@ -140,7 +147,8 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
       val fields = productFields[mels, mets]
       val tData = dataRefinementType(fields).asType
       val (cls, clsDef) = dataClass(fields)
-      val newCls = Apply(Select(New(TypeIdent(cls)), cls.primaryConstructor), Nil)
+      println(cls.primaryConstructor)
+      val newCls = Apply(Select(New(TypeIdent(cls)), cls.primaryConstructor), List(source.asTerm))
       // TODO: Why do we have to match here?
       tData match {
         case '[data] =>
