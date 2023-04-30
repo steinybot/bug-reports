@@ -25,11 +25,9 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
     ExprImpl(tree.asInstanceOf[tpd.Tree], SpliceScope.getCurrent).asInstanceOf[Expr[A]]
 
   // NOTE: Don't forget that any constructor parameters also need a ValDef if you want them to be accessible.
-  def classDefWithPrimaryConstructor(
+  def replacePrimaryConstructor(
       cls: Symbol,
       clsDef: ClassDef,
-                                    // TODO: I think we can remove this body and take the one from the class again.
-      body: List[Statement])(
       paramNames: List[String],
       paramInfosExp: MethodType => List[TypeRepr],
       rhsFn: List[List[Tree]] => Option[Term] = _ => None
@@ -41,11 +39,12 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
     // TODO: How else do we replace the primary constructor?
     //  newClass adds one for us but doesn't allow us to add params etc.
     cls.asInstanceOf[dotty.tools.dotc.core.Symbols.ClassSymbol]
-      .replace(cls.primaryConstructor.asInstanceOf[dotty.tools.dotc.core.Symbols.Symbol], ctorSym.asInstanceOf[dotty.tools.dotc.core.Symbols.Symbol])
+      .replace(
+        cls.primaryConstructor.asInstanceOf[dotty.tools.dotc.core.Symbols.Symbol],
+        ctorSym.asInstanceOf[dotty.tools.dotc.core.Symbols.Symbol]
+      )
     val ctorDef = DefDef(ctorSym, rhsFn)
-    // TODO: Make sure that this is actually adding the ctor to the body.
-    val newDef = ClassDef.copy(clsDef)(clsDef.name, ctorDef, clsDef.parents, None, body)
-    newDef
+    ClassDef.copy(clsDef)(clsDef.name, ctorDef, clsDef.parents, None, clsDef.body)
 
   val sourceTpe = TypeRepr.of[T]
   val sourceSym = sourceTpe.typeSymbol
@@ -90,9 +89,7 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
     val parents = List(TypeTree.of[Object], TypeTree.of[Selectable])
     val sourceParamName = Symbol.freshName("source")
     def decls(cls: Symbol) =
-//      val ctor = Symbol.newMethod(cls, "<init>", MethodType(List(sourceParamName))(_ => List(sourceTypeRef), _ => cls.typeRef))
       List(
-//        ctor,
         Symbol.newVal(cls, sourceParamName, sourceTpe, LocalParamAccessor, cls), //Symbol.noSymbol),
         Symbol.newMethod(cls, "selectDynamic", MethodType(List("name"))(_ => List(TypeRepr.of[String]), _ => TypeRepr.of[Any]))
       )
@@ -100,19 +97,10 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
     // NOTE: Do not forget to put the symbol in the decls!
     //  If you do then the code looks fine but it's not a real member and you get really confusing errors.
     val body = List[Statement](
-//      ValDef( //
-//        sourceParamSym,
-//        None
-//      ).asInstanceOf[dotty.tools.dotc.ast.Trees.ValDef[_]]
-//        .withMods(dotty.tools.dotc.ast.untpd.EmptyModifiers.withFlags(LocalParamAccessor.asInstanceOf[dotty.tools.dotc.core.Flags.FlagSet]))
-//        .asInstanceOf[Statement]
-//      ,
-//      DefDef(cls.primaryConstructor, _ => None),
       ValDef(
         cls.declaredField(sourceParamName),
         None
       ),
-
       DefDef( //
         cls.methodMember("selectDynamic").head,
         _ => Some(Match(
@@ -130,16 +118,13 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
         ))
       )
     )
-//    val clsDef = ClassDef(cls, parents, body)
-    val clsDef = classDefWithPrimaryConstructor(
+    val clsDef = replacePrimaryConstructor(
       cls = cls,
       clsDef = ClassDef(cls, parents, body),
-      body = body)(
       paramNames = List(sourceParamName),
       paramInfosExp = _ => List(sourceTypeRef),
       rhsFn = _ => None
     )
-//    println(clsDef.show)
     cls -> clsDef
   end dataClass
 
@@ -157,7 +142,6 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
       val fields = productFields[mels, mets]
       val tData = dataRefinementType(fields).asType
       val (cls, clsDef) = dataClass(fields)
-      println(cls.primaryConstructor)
       val newCls = Apply(Select(New(TypeIdent(cls)), cls.primaryConstructor), List(source.asTerm))
       // TODO: Why do we have to match here?
       tData match {
