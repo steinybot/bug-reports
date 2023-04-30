@@ -37,9 +37,15 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
     // It seems we have to use a really convoluted process to specify our own constructor.
     val DefDef(ctorName, _, _, _) = clsDef.constructor
     val ctorMethodType = MethodType(paramNames)(paramInfosExp, _ => cls.typeRef)
-    val sCtor = Symbol.newMethod(cls, ctorName, ctorMethodType)
-    val ctorDef = DefDef(sCtor, rhsFn)
-    ClassDef.copy(clsDef)(clsDef.name, ctorDef, clsDef.parents, None, body)
+    val ctorSym = Symbol.newMethod(cls, ctorName, ctorMethodType, Flags.Synthetic, Symbol.noSymbol)
+    // TODO: How else do we replace the primary constructor?
+    //  newClass adds one for us but doesn't allow us to add params etc.
+    cls.asInstanceOf[dotty.tools.dotc.core.Symbols.ClassSymbol]
+      .replace(cls.primaryConstructor.asInstanceOf[dotty.tools.dotc.core.Symbols.Symbol], ctorSym.asInstanceOf[dotty.tools.dotc.core.Symbols.Symbol])
+    val ctorDef = DefDef(ctorSym, rhsFn)
+    // TODO: Make sure that this is actually adding the ctor to the body.
+    val newDef = ClassDef.copy(clsDef)(clsDef.name, ctorDef, clsDef.parents, None, body)
+    newDef
 
   val sourceTpe = TypeRepr.of[T]
   val sourceSym = sourceTpe.typeSymbol
@@ -84,7 +90,9 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
     val parents = List(TypeTree.of[Object], TypeTree.of[Selectable])
     val sourceParamName = Symbol.freshName("source")
     def decls(cls: Symbol) =
+//      val ctor = Symbol.newMethod(cls, "<init>", MethodType(List(sourceParamName))(_ => List(sourceTypeRef), _ => cls.typeRef))
       List(
+//        ctor,
         Symbol.newVal(cls, sourceParamName, sourceTpe, LocalParamAccessor, cls), //Symbol.noSymbol),
         Symbol.newMethod(cls, "selectDynamic", MethodType(List("name"))(_ => List(TypeRepr.of[String]), _ => TypeRepr.of[Any]))
       )
@@ -99,6 +107,7 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
 //        .withMods(dotty.tools.dotc.ast.untpd.EmptyModifiers.withFlags(LocalParamAccessor.asInstanceOf[dotty.tools.dotc.core.Flags.FlagSet]))
 //        .asInstanceOf[Statement]
 //      ,
+//      DefDef(cls.primaryConstructor, _ => None),
       ValDef(
         cls.declaredField(sourceParamName),
         None
@@ -121,6 +130,7 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
         ))
       )
     )
+//    val clsDef = ClassDef(cls, parents, body)
     val clsDef = classDefWithPrimaryConstructor(
       cls = cls,
       clsDef = ClassDef(cls, parents, body),
