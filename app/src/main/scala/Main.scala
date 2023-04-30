@@ -14,25 +14,30 @@ trait Blah
 //  }
 //}
 
-type Ref = {
+//@experimental
+//@inspect
+class Data(source: Person) extends Selectable {
+  def selectDynamic(name: String): Any = "name" match {
+    case "name" => source.name
+  }
+  def applyDynamic(name: String)(args: Any*): Any = "name" match {
+    case "name" => source.name
+  }
+}
+
+type Ref = Data {
   def name: String
 }
 
-//@experimental
-//@inspect
-//class Data$macro$1(source$macro$1: Person) extends java.lang.Object with scala.Selectable {
-//  def selectDynamic(name: java.lang.String): scala.Any = "name" match {
-//    case "name" =>
-//      Data$macro$1.this.source$macro$1.name
-//  }
-//}
-
-case class Person(name: String)
+case class Person(name: String) extends Named
 
 object Main extends App {
   val alice = data(Person("Alice"))
-//  println(alice.name)
+  println(alice.name)
+  println(alice.withName("Bob").name)
 
-  //new Data$macro$1(Person("Alice")).asInstanceOf[Ref].name
-//  new Data$macro$1(Person("Alice")).asInstanceOf[Ref].selectDynamic("name")
+//  println(alice.selectDynamic("name"))
+
+//  new Data$macro$1(Person("Alice")).asInstanceOf[Ref].name
+//  println(new Data(Person("Alice")).asInstanceOf[Ref].selectDynamic("name"))
 }

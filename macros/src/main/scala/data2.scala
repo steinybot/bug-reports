@@ -6,17 +6,16 @@ import scala.deriving.Mirror
 import scala.quoted.*
 import scala.quoted.runtime.impl.{ExprImpl, QuotesImpl, SpliceScope}
 
-trait DataSource extends Selectable {
-  // These need to be visible members of the result otherwise if fails to compile, saying that they are not a member.
-  def selectDynamic(name: String): Any
-  def applyDynamic(name: String)(args: Any*): Any
+trait Named {
+  def name: String
 }
 
-transparent inline def data[T](source: T) =
-  ${ dataImpl[T]('source) }
+
+transparent inline def data2[T <: Named](source: T) =
+  ${ data2Impl[T]('source) }
 
 @experimental
-private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
+private def data2Impl[T <: Named: Type](source: Expr[T])(using Quotes): Expr[Any] =
   val quotesTyped: Quotes = quotes
   import quotesTyped.reflect.*
 //  import quotes.reflect.*
@@ -78,8 +77,8 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
     loop[Labels, Types](Nil).reverse
   end productFields
 
-  def dataRefinementType(fields: Fields): TypeRepr =
-    fields.foldLeft(TypeRepr.of[DataSource]) {
+  def dataRefinementType(dataTpe: TypeRepr, fields: Fields): TypeRepr =
+    fields.foldLeft(dataTpe) {
       case (result, (label, tpe)) =>
         val resultWithField = Refinement(result, label, tpe)
         // FIXME: What type to use?
@@ -94,7 +93,7 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
   def dataClass(fields: Fields): (Symbol, ClassDef) =
     val name = Symbol.freshName("Data")
     // TODO: Copy the parents (if not sealed).
-    val parents = List(TypeTree.of[Object], TypeTree.of[DataSource], TypeTree.of[Selectable])
+    val parents = List(TypeTree.of[Object], TypeTree.of[Selectable])
     val sourceParamName = Symbol.freshName("source")
     def decls(cls: Symbol) =
       List(
@@ -149,14 +148,28 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
     } =>
       val fields = productFields[mels, mets]
       val (cls, clsDef) = dataClass(fields)
-      val tData = dataRefinementType(fields).asType
+      val tData = dataRefinementType(cls.typeRef, fields).asType
       val newCls = Apply(Select(New(TypeIdent(cls)), cls.primaryConstructor), List(source.asTerm))
-      // TODO: Why do we have to match here? tData.Underlying doesn't seem to work.
-      tData match {
-        case '[data] =>
-          '{
-             ${unsafeToExpr(Block(stats = List(clsDef), expr = newCls))}.asInstanceOf[data]
-          }
-      }
+      // TODO: Why do we have to match here?
+//      val x = tData match {
+//        case '[data] =>
+//          '{
+//             ${unsafeToExpr(Block(stats = List(clsDef), expr = newCls))}.asInstanceOf[data]
+//          }
+//      }
+//      println(x.show)
+        val t = Type.of[T]
+        '{
+            class Data(source: t.Underlying) extends DataSource with Selectable {
+              def selectDynamic(name: String): Any = "name" match {
+                case "name" => source.name
+              }
+            }
+            new Data($source).asInstanceOf[DataSource {
+              val name: String
+              def withName(value: String): Any
+              def selectDynamic(name: String): Any
+            }]
+        }
 
-end dataImpl
+end data2Impl
