@@ -22,6 +22,23 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
     // HINT: Take a look at dotty.tools.dotc.typer.QuotesAndSplices
     ExprImpl(tree.asInstanceOf[tpd.Tree], SpliceScope.getCurrent).asInstanceOf[Expr[A]]
 
+  def typeRefOf[A: Type]: TypeRef =
+    TypeRepr.of[A].typeSymbol.typeRef
+
+  def withPrimaryConstructor(
+      cls: Symbol,
+      clsDef: ClassDef,
+      paramNames: List[String],
+      paramInfosExp: MethodType => List[TypeRepr],
+      rhsFn: List[List[Tree]] => Option[Term] = _ => None
+  ): ClassDef =
+    // It seems we have to use a really convoluted process to specify our own constructor.
+    val DefDef(ctorName, _, _, _) = clsDef.constructor
+    val ctorMethodType = MethodType(paramNames)(paramInfosExp, _ => cls.typeRef)
+    val sCtor = Symbol.newMethod(cls, ctorName, ctorMethodType)
+    val ctorDef = DefDef(sCtor, rhsFn)
+    ClassDef.copy(clsDef)(clsDef.name, ctorDef, clsDef.parents, None, clsDef.body)
+
   type Fields = List[(String, TypeRepr)]
 
   def productFields[Labels <: Tuple: Type, Types <: Tuple: Type]: Fields =
@@ -62,15 +79,16 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
     def decls(cls: Symbol) =
       List.empty[Symbol]
     val cls = Symbol.newClass(Symbol.spliceOwner, name, parents.map(_.tpe), decls, selfType = None)
-//    val ctor = DefDef(cls.primaryConstructor)
-//    val dataFields = fields.foldLeft(List.empty[Statement]) {
-//      case (result, (label, tpeRepr)) =>
-//        // TODO: Copy the flags from the source.
-//        val fieldSym = Symbol.newVal(cls, label, tpeRepr, Flags.EmptyFlags)
-//        ValDef(fieldSym)
-//    }
-    val body = List.empty[Statement]
-    cls -> ClassDef(cls, parents, body)
+    val body = List.empty[DefDef]
+    val sourceParamName = Symbol.freshName("source")
+    val clsDef = withPrimaryConstructor(
+      cls = cls,
+      clsDef = ClassDef(cls, parents, body),
+      paramNames = List(sourceParamName),
+      paramInfosExp = _ => List(typeRefOf[T]),
+      _ => None
+    )
+    cls -> clsDef
   end dataClass
 
   // TODO: Remove the get
