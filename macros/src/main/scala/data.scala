@@ -18,16 +18,18 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
   val quotesImpl: QuotesImpl = quotes.asInstanceOf[QuotesImpl]
   implicit val context = quotesImpl.ctx
 
+  val LocalParamAccessor = Flags.Local | Flags.ParamAccessor | Flags.Private
+
   def unsafeToExpr[A](tree: Tree): Expr[A] =
     // HINT: Take a look at dotty.tools.dotc.typer.QuotesAndSplices
     ExprImpl(tree.asInstanceOf[tpd.Tree], SpliceScope.getCurrent).asInstanceOf[Expr[A]]
 
-  def typeRefOf[A: Type]: TypeRef =
-    TypeRepr.of[A].typeSymbol.typeRef
-
-  def withPrimaryConstructor(
+  // NOTE: Don't forget that any constructor parameters also need a ValDef if you want them to be accessible.
+  def classDefWithPrimaryConstructor(
       cls: Symbol,
       clsDef: ClassDef,
+                                    // TODO: I think we can remove this body and take the one from the class again.
+      body: List[Statement])(
       paramNames: List[String],
       paramInfosExp: MethodType => List[TypeRepr],
       rhsFn: List[List[Tree]] => Option[Term] = _ => None
@@ -37,7 +39,11 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
     val ctorMethodType = MethodType(paramNames)(paramInfosExp, _ => cls.typeRef)
     val sCtor = Symbol.newMethod(cls, ctorName, ctorMethodType)
     val ctorDef = DefDef(sCtor, rhsFn)
-    ClassDef.copy(clsDef)(clsDef.name, ctorDef, clsDef.parents, None, clsDef.body)
+    ClassDef.copy(clsDef)(clsDef.name, ctorDef, clsDef.parents, None, body)
+
+  val sourceTpe = TypeRepr.of[T]
+  val sourceSym = sourceTpe.typeSymbol
+  val sourceTypeRef = sourceSym.typeRef
 
   type Fields = List[(String, TypeRepr)]
 
@@ -76,18 +82,47 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
     val name = Symbol.freshName("Data")
     // TODO: Copy the parents (if not sealed).
     val parents = List(TypeTree.of[Object], TypeTree.of[Selectable])
-    def decls(cls: Symbol) =
-      List.empty[Symbol]
-    val cls = Symbol.newClass(Symbol.spliceOwner, name, parents.map(_.tpe), decls, selfType = None)
-    val body = List.empty[DefDef]
     val sourceParamName = Symbol.freshName("source")
-    val clsDef = withPrimaryConstructor(
+    def decls(cls: Symbol) =
+      List(
+        Symbol.newMethod(cls, "selectDynamic", MethodType(List("name"))(_ => List(TypeRepr.of[String]), _ => TypeRepr.of[Any]))
+      )
+    val cls = Symbol.newClass(Symbol.spliceOwner, name, parents.map(_.tpe), decls, selfType = None)
+    val body = List[Statement](
+      ValDef( //
+        Symbol.newVal(cls, sourceParamName, sourceTpe, LocalParamAccessor, Symbol.noSymbol),
+        None
+      ).asInstanceOf[dotty.tools.dotc.ast.Trees.ValDef[_]]
+        .withMods(dotty.tools.dotc.ast.untpd.EmptyModifiers.withFlags(LocalParamAccessor.asInstanceOf[dotty.tools.dotc.core.Flags.FlagSet]))
+        .asInstanceOf[Statement]
+      ,
+
+      DefDef( //
+        cls.methodMember("selectDynamic").head,
+        _ => Some(Match(
+          selector = '{ "name" }.asTerm,
+          cases = fields.map {
+            case (label, _) => CaseDef(
+              pattern = Literal(StringConstant(label)),
+              guard = None,
+              rhs = Select(
+                qualifier = Ident(TermRef(This(cls).tpe, sourceParamName)),
+                symbol = sourceSym.fieldMember(label)
+              )
+            )
+          }
+        ))
+      )
+    )
+    val clsDef = classDefWithPrimaryConstructor(
       cls = cls,
       clsDef = ClassDef(cls, parents, body),
+      body = body)(
       paramNames = List(sourceParamName),
-      paramInfosExp = _ => List(typeRefOf[T]),
-      _ => None
+      paramInfosExp = _ => List(sourceTypeRef),
+      rhsFn = _ => None
     )
+//    println(clsDef.show)
     cls -> clsDef
   end dataClass
 
