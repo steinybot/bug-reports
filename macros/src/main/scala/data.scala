@@ -6,10 +6,11 @@ import scala.deriving.Mirror
 import scala.quoted.*
 import scala.quoted.runtime.impl.{ExprImpl, QuotesImpl, SpliceScope}
 
+// TODO: Tidy up syntax.
 trait DataSource extends Selectable {
   // These need to be visible members of the result otherwise if fails to compile, saying that they are not a member.
   def selectDynamic(name: String): Any
-  def applyDynamic(name: String)(args: Any*): Any
+//  def applyDynamic(name: String)(args: Any*): Any
 }
 
 transparent inline def data[T](source: T) =
@@ -79,15 +80,16 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
   end productFields
 
   def dataRefinementType(fields: Fields): TypeRepr =
-    fields.foldLeft(TypeRepr.of[DataSource]) {
+    fields.foldLeft(RecursiveType(_ => TypeRepr.of[DataSource])) {
       case (result, (label, tpe)) =>
         val resultWithField = Refinement(result, label, tpe)
         // FIXME: What type to use?
         //val withResultType = result.recThis
         val withResultType = TypeRepr.of[Any]
-        val withMethodType = MethodType(List("value"))(_ => List(tpe), _ => withResultType)
+        val withMethodType = MethodType(List(label))(_ => List(tpe), _ => withResultType)
         // TODO: Ensure that there is no name conflict.
-        Refinement(resultWithField, s"with${label.capitalize}", withMethodType)
+        val resultWithMethod = Refinement(resultWithField, s"with${label.capitalize}", withMethodType)
+        RecursiveType(_ => resultWithMethod)
     }
   end dataRefinementType
 
