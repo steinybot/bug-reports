@@ -18,12 +18,12 @@ type Ref = Data {
   // For example:
   //   type Ref = { type Self }
   //   type DataRef = Data & Ref { type Self = Data & Ref }
-  type Self = this.type
+//  type Self = this.type
   def name: String
   // Have to use this.type because of:
   // - https://github.com/lampepfl/dotty/issues/17380
   // - https://github.com/lampepfl/dotty/issues/17381
-  def withName(name: String): this.type
+  def withName(newName: String): this.type
 }
 
 def manualData(person: Person) = new Data(person).asInstanceOf[Ref]
@@ -31,18 +31,26 @@ def manualData(person: Person) = new Data(person).asInstanceOf[Ref]
 case class Person(name: String)
 
 object Person:
-  private val eg = manualData(Person(""))
-  private type Data = Ref //eg.Self
+//  val eg = manualData(Person(""))
+  type Data = Ref
   given Conversion[Person, Data] = manualData
   // TODO: Convert the other way.
   //given Conversion[Data, Person] = manualData
 
+@experimental
+@inspect
+object Container {
+  type Refine = {
+    def foo: this.type
+  }
+}
+
 object Main extends App {
-//  val alice = data(Person("Alice"))
-//  println(alice.name)
-//  println(alice.withName("Bob").name)
+  val alice = data(Person("Alice"))
+  println(alice.name)
+  println(alice.withName("Bob").name)
 
 //  println(new Data(Person("Alice")).asInstanceOf[Ref].name)
-  println(new Data(Person("Alice")).asInstanceOf[Ref].withName("Bob").name)
-  println(Person("Alice").withName("Bob").name)
+//  println(new Data(Person("Alice")).asInstanceOf[Ref].withName("Bob").name)
+//  println(Person("Alice").withName("Bob").name)
 }

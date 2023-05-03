@@ -10,7 +10,7 @@ import scala.quoted.runtime.impl.{ExprImpl, QuotesImpl, SpliceScope}
 trait DataSource extends Selectable {
   // These need to be visible members of the result otherwise if fails to compile, saying that they are not a member.
   def selectDynamic(name: String): Any
-//  def applyDynamic(name: String)(args: Any*): Any
+  def applyDynamic(name: String)(args: Any*): Any
 }
 
 transparent inline def data[T](source: T) =
@@ -84,10 +84,14 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
       case (result, (label, tpe)) =>
         val resultWithField = Refinement(result, label, tpe)
         // FIXME: What type to use?
-        //val withResultType = result.recThis
-        val withResultType = TypeRepr.of[Any]
+//        val withResultType = result.recThis.binder
+// FIXME: Fails with dotty.tools.dotc.ast.Trees$UnAssignedTypeException: type of Ident() is not assigned
+//  I think this result type has to be Singleton(This(refinedClass))
+//  And refinedClass is some Template thing where the return type there is the EmptyTreeIdent
+//        val withResultType = Singleton(dotty.tools.dotc.ast.untpd.EmptyTypeIdent.asInstanceOf[Ident]).ref.tpe
         val withMethodType = MethodType(List(label))(_ => List(tpe), _ => withResultType)
         // TODO: Ensure that there is no name conflict.
+        //  Make sure to keep the name in sync with the DefDef below.
         val resultWithMethod = Refinement(resultWithField, s"with${label.capitalize}", withMethodType)
         RecursiveType(_ => resultWithMethod)
     }
@@ -101,7 +105,8 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
     def decls(cls: Symbol) =
       List(
         Symbol.newVal(cls, sourceParamName, sourceTpe, LocalParamAccessor, cls), //Symbol.noSymbol),
-        Symbol.newMethod(cls, "selectDynamic", MethodType(List("name"))(_ => List(TypeRepr.of[String]), _ => TypeRepr.of[Any]))
+        Symbol.newMethod(cls, "selectDynamic", MethodType(List("name"))(_ => List(TypeRepr.of[String]), _ => TypeRepr.of[Any])),
+        Symbol.newMethod(cls, "applyDynamic", MethodType(List("name"))(_ => List(TypeRepr.of[String]), _ => MethodType(List("args"))(_ => List(AppliedType(defn.RepeatedParamClass.typeRef, List(TypeRepr.of[Any]))), _ => TypeRepr.of[Any])))
       )
     val cls = Symbol.newClass(Symbol.spliceOwner, name, parents.map(_.tpe), decls, selfType = None)
     // NOTE: Do not forget to put the symbol in the decls!
@@ -113,11 +118,29 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
       ),
       DefDef( //
         cls.methodMember("selectDynamic").head,
+        {
+          case (name :: Nil) :: Nil => Some(Match(
+            selector = name.asExpr.asTerm, //'{ "name" }.asTerm,
+            cases = fields.map {
+              case (label, _) => CaseDef(
+                pattern = Literal(StringConstant(label)),
+                guard = None,
+                rhs = Select(
+                  qualifier = Ident(TermRef(This(cls).tpe, sourceParamName)),
+                  symbol = sourceSym.fieldMember(label)
+                )
+              )
+            }
+          ))
+        }
+      ),
+      DefDef( //
+        cls.methodMember("applyDynamic").head,
         _ => Some(Match(
           selector = '{ "name" }.asTerm,
           cases = fields.map {
             case (label, _) => CaseDef(
-              pattern = Literal(StringConstant(label)),
+              pattern = Literal(StringConstant(s"with${label.capitalize}")),
               guard = None,
               rhs = Select(
                 qualifier = Ident(TermRef(This(cls).tpe, sourceParamName)),
@@ -154,11 +177,13 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
       val tData = dataRefinementType(fields).asType
       val newCls = Apply(Select(New(TypeIdent(cls)), cls.primaryConstructor), List(source.asTerm))
       // TODO: Why do we have to match here? tData.Underlying doesn't seem to work.
-      tData match {
+      val result = tData match {
         case '[data] =>
           '{
              ${unsafeToExpr(Block(stats = List(clsDef), expr = newCls))}.asInstanceOf[data]
           }
       }
+      println(result.show)
+      result
 
 end dataImpl
