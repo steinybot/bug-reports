@@ -1,9 +1,12 @@
+// TODO: Get rid of this.
 import dotty.tools.dotc.ast.tpd
-import scala.annotation.{MacroAnnotation, experimental, tailrec}
-import scala.collection.immutable.{AbstractSeq, LinearSeq}
+import scala.annotation.{experimental, tailrec}
+//import scala.collection.immutable.{AbstractSeq, LinearSeq}
+// TODO: Get rid of this.
 import scala.compiletime.*
 import scala.deriving.Mirror
 import scala.quoted.*
+// TODO: Get rid of these.
 import scala.quoted.runtime.impl.{ExprImpl, QuotesImpl, SpliceScope}
 
 // TODO: Tidy up syntax.
@@ -40,7 +43,8 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
       clsDef: ClassDef,
       paramNames: List[String],
       paramInfosExp: MethodType => List[TypeRepr],
-      rhsFn: List[List[Tree]] => Option[Term] = _ => None
+      rhsFn: List[List[Tree]] => Option[Term] = _ => None,
+      body: Symbol => List[Statement]
   ): ClassDef =
     // It seems we have to use a really convoluted process to specify our own constructor.
     val DefDef(ctorName, _, _, _) = clsDef.constructor
@@ -54,7 +58,7 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
         ctorSym.asInstanceOf[dotty.tools.dotc.core.Symbols.Symbol]
       )
     val ctorDef = DefDef(ctorSym, rhsFn)
-    ClassDef.copy(clsDef)(clsDef.name, ctorDef, clsDef.parents, None, clsDef.body)
+    ClassDef.copy(clsDef)(clsDef.name, ctorDef, clsDef.parents, None, body(cls))
 
   val sourceTpe = TypeRepr.of[T]
   val sourceSym = sourceTpe.typeSymbol
@@ -80,55 +84,16 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
   end productFields
 
   def dataRefinementType(fields: Fields): TypeRepr =
-    val emptyIdent = dotty.tools.dotc.ast.untpd.EmptyTypeIdent.asInstanceOf[Ident]
-
-//    def refinementDecls(symbol: Symbol) =
-//      val thisTypeRepr = This(symbol).tpe
-//      fields.flatMap { (label, tpe) => List(
-//        // TODO: What should the flags be?
-//        Symbol.newVal(symbol, label, tpe, Flags.EmptyFlags, Symbol.noSymbol),
-//        Symbol.newMethod(symbol, s"with${label.capitalize}", thisTypeRepr, Flags.EmptyFlags, Symbol.noSymbol)
-//      )}
-//    val refinementSym = Symbol.newClass(Symbol.spliceOwner, "<refinement>", List(TypeRepr.of[Object]), refinementDecls, None)
-//      .asInstanceOf[dotty.tools.dotc.core.Symbols.ClassSymbol]
-//      .copy(flags = Flags.Trait.asInstanceOf[dotty.tools.dotc.core.Flags.FlagSet])
-//      .asInstanceOf[Symbol]
-
-    fields.foldLeft(RecursiveType(_ => TypeRepr.of[DataSource])) {
-      case (result, (label, tpe)) =>
-        val resultWithField = Refinement(result, label, tpe)
-
-        // FIXME: What type to use?
-
-        val withResultType = result.recThis
-
-// FIXME: Fails with dotty.tools.dotc.ast.Trees$UnAssignedTypeException: type of Ident() is not assigned
-//  I think this result type has to be Singleton(This(refinedClass))
-//  And refinedClass is some Template thing where the return type there is the EmptyTreeIdent
-//        val withResultType = Singleton(dotty.tools.dotc.ast.untpd.EmptyTypeIdent.asInstanceOf[Ident]).ref.tpe
-
-//        val withResultType = This(refinementSym).tpe
-
-//        val withResultType = Singleton(Ident(refinementSym.termRef)).ref.tpe
-
-//        val withResultType = This(emptyIdent).tpe
-
-//        val withResultType = unsafeToExpr(TypeTree)
-//
-        val withMethodType = MethodType(List(label))(_ => List(tpe), _ => withResultType)
-        // TODO: Ensure that there is no name conflict.
-        //  Make sure to keep the name in sync with the DefDef above and below.
-        val resultWithMethod = Refinement(resultWithField, s"with${label.capitalize}", withMethodType)
-        RecursiveType { _ => resultWithMethod }
-
-//        RecursiveType { parentExp =>
-//          val withResultType = This(parentExp.termSymbol).tpe
-////          val withResultType = Singleton(Ident(parentExp.termSymbol.termRef)).ref.tpe
-//          val withMethodType = MethodType(List(label))(_ => List(tpe), _ => withResultType)
-//          // TODO: Ensure that there is no name conflict.
-//          //  Make sure to keep the name in sync with the DefDef above and below.
-//          Refinement(resultWithField, s"with${label.capitalize}", withMethodType)
-//        }
+    RecursiveType { recursiveType =>
+      fields.foldLeft[TypeRepr](TypeRepr.of[DataSource]) {
+        case (result, (label, tpe)) =>
+          val resultWithField = Refinement(result, label, tpe)
+          val withResultType = recursiveType.recThis
+          val withMethodType = MethodType(List(label))(_ => List(tpe), _ => withResultType)
+          // TODO: Ensure that there is no name conflict.
+          //  Make sure to keep the name in sync with the DefDef above and below.
+          Refinement(resultWithField, s"with${label.capitalize}", withMethodType)
+      }
     }
 
   end dataRefinementType
@@ -141,13 +106,37 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
     def decls(cls: Symbol) =
       List(
         Symbol.newVal(cls, sourceParamName, sourceTpe, LocalParamAccessor, cls), //Symbol.noSymbol),
-        Symbol.newMethod(cls, "selectDynamic", MethodType(List("name"))(_ => List(TypeRepr.of[String]), _ => TypeRepr.of[Any])),
-        Symbol.newMethod(cls, "applyDynamic", MethodType(List("name"))(_ => List(TypeRepr.of[String]), _ => MethodType(List("args"))(_ => List(AppliedType(defn.RepeatedParamClass.typeRef, List(TypeRepr.of[Any]))), _ => TypeRepr.of[Any])))
+        Symbol.newMethod(
+          cls,
+          "selectDynamic",
+          MethodType(List("name"))(
+            _ => List(TypeRepr.of[String]),
+            _ => TypeRepr.of[Any]
+          )
+        ),
+        Symbol.newMethod(
+          cls,
+          "applyDynamic",
+          MethodType(List("name"))(
+            _ => List(TypeRepr.of[String]),
+            _ => MethodType(List("args"))(
+              _ => List(
+                AppliedType(defn.RepeatedParamClass.typeRef, List(TypeRepr.of[Any]))
+//                AnnotatedType(
+//                  AppliedType(TypeRepr.of[Seq], List(TypeRepr.of[Any])),
+//                  Apply(Select(New(TypeTree.ref(defn.RepeatedAnnot)), defn.RepeatedAnnot.primaryConstructor), Nil)
+//                )
+              ),
+              _ => TypeRepr.of[Any]
+            )
+          )
+        )
       )
     val cls = Symbol.newClass(Symbol.spliceOwner, name, parents.map(_.tpe), decls, selfType = None)
+    val sourceParam = Ident(TermRef(This(cls).tpe, sourceParamName))
     // NOTE: Do not forget to put the symbol in the decls!
     //  If you do then the code looks fine but it's not a real member and you get really confusing errors.
-    val body = List[Statement](
+    def body(cls: Symbol) = List[Statement](
       ValDef(
         cls.declaredField(sourceParamName),
         None
@@ -156,13 +145,13 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
         cls.methodMember("selectDynamic").head,
         {
           case (name :: Nil) :: Nil => Some(Match(
-            selector = name.asExpr.asTerm, //'{ "name" }.asTerm,
+            selector = name.asExpr.asTerm,
             cases = fields.map {
               case (label, _) => CaseDef(
                 pattern = Literal(StringConstant(label)),
                 guard = None,
                 rhs = Select(
-                  qualifier = Ident(TermRef(This(cls).tpe, sourceParamName)),
+                  qualifier = sourceParam,
                   symbol = sourceSym.fieldMember(label)
                 )
               )
@@ -172,27 +161,42 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
       ),
       DefDef( //
         cls.methodMember("applyDynamic").head,
-        _ => Some(Match(
-          selector = '{ "name" }.asTerm,
-          cases = fields.map {
-            case (label, _) => CaseDef(
-              pattern = Literal(StringConstant(s"with${label.capitalize}")),
-              guard = None,
-              rhs = Select(
-                qualifier = Ident(TermRef(This(cls).tpe, sourceParamName)),
-                symbol = sourceSym.fieldMember(label)
+        {
+          case (name :: Nil) :: (value :: Nil) :: Nil => Some(Match(
+            selector = name.asExpr.asTerm,
+            cases = fields.map {
+              case (label, tpe) => CaseDef(
+                pattern = Literal(StringConstant(s"with${label.capitalize}")),
+                guard = None,
+                rhs = Apply(
+                  Select(New(TypeIdent(cls)), cls.primaryConstructor),
+                  List(Apply(
+                    Select.unique(sourceParam, "copy"),
+                    List(NamedArg(
+                      label,
+                      TypeApply(
+                        Select.unique(
+                          Apply(Select.unique(value.asExpr.asTerm, "apply"), List('{0}.asTerm)),
+                          "asInstanceOf"
+                        ),
+                        List(TypeTree.ref(tpe.typeSymbol))
+                      )
+                    ))
+                  ))
+                )
               )
-            )
-          }
-        ))
+            }
+          ))
+        }
       )
     )
     val clsDef = replacePrimaryConstructor(
       cls = cls,
-      clsDef = ClassDef(cls, parents, body),
+      clsDef = ClassDef(cls, parents, Nil),
       paramNames = List(sourceParamName),
       paramInfosExp = _ => List(sourceTypeRef),
-      rhsFn = _ => None
+      rhsFn = _ => None,
+      body
     )
     cls -> clsDef
   end dataClass

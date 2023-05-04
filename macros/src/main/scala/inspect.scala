@@ -456,6 +456,7 @@ class inspect extends MacroAnnotation:
 
     display(result, 0)
 
+    println(tree.show)
     List(tree)
 
 end inspect

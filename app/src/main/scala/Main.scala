@@ -9,7 +9,7 @@ class MainData(source: Person) extends DataSource with Selectable {
     case "name" => source.name
   }
   def applyDynamic(name: String)(args: Any*): Any = name match {
-    case "withName" => new MainData(source.copy(name = args.head.asInstanceOf[String]))
+    case "withName" => new MainData(source.copy(name = args(0).asInstanceOf[String]))
   }
 }
 
@@ -40,18 +40,22 @@ object Person:
 //@experimental
 //@inspect
 //object Container {
-////  type Refine = {
-////    def foo: this.type
-////  }
-//  def foo: { def bar: this.type } = ???
+//  type Refine = {
+//    def foo: this.type
+//  }
+//  //
+////  def foo: { def bar: this.type } = ???
 //}
 
 object Main extends App {
-  val alice = data(Person("Alice"))
-//  println(alice.name)
-//  println(alice.withName("Bob").name)
+//  thing.me.name
+//  thing2.me.name
 
-//  println(new Data(Person("Alice")).asInstanceOf[Ref].name)
-//  println(new Data(Person("Alice")).asInstanceOf[Ref].withName("Bob").name)
+  val alice = data(Person("Alice"))
+  println(alice.name)
+  println(alice.withName("Bob").name)
+
+//  println(new MainData(Person("Alice")).asInstanceOf[Ref].name)
+//  println(new MainData(Person("Alice")).asInstanceOf[Ref].withName("Bob").name)
 //  println(Person("Alice").withName("Bob").name)
 }
