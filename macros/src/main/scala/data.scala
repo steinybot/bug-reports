@@ -1,13 +1,8 @@
-// TODO: Get rid of this.
-import dotty.tools.dotc.ast.tpd
 import scala.annotation.{experimental, tailrec}
-//import scala.collection.immutable.{AbstractSeq, LinearSeq}
 // TODO: Get rid of this.
 import scala.compiletime.*
 import scala.deriving.Mirror
 import scala.quoted.*
-// TODO: Get rid of these.
-import scala.quoted.runtime.impl.{ExprImpl, QuotesImpl, SpliceScope}
 
 // TODO: Tidy up syntax.
 trait DataSource extends Selectable {
@@ -25,19 +20,11 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
   import quotesTyped.reflect.*
 //  import quotes.reflect.*
 
-  val quotesImpl: QuotesImpl = quotes.asInstanceOf[QuotesImpl]
-  implicit val context = quotesImpl.ctx
-
   val LocalParamAccessor = Flags.Local | Flags.ParamAccessor | Flags.Private
 
-  def unsafeToExpr[A](tree: Tree): Expr[A] =
-    // There doesn't seem to be any other way to convert a Definition to an Expr[Unit] despite being able to do that
-    // with quotes. We can't use quotes since you cannot splice in parts of expressions which is what you need to be
-    // able to do to support arbitrary number of parameters etc.
-    // HINT: Take a look at dotty.tools.dotc.typer.QuotesAndSplices
-    ExprImpl(tree.asInstanceOf[tpd.Tree], SpliceScope.getCurrent).asInstanceOf[Expr[A]]
-
+  // TODO: Update the symbol before creating the initial ClassDef.
   // NOTE: Don't forget that any constructor parameters also need a ValDef if you want them to be accessible.
+  // See https://users.scala-lang.org/t/unable-to-set-primary-constructor-for-symbol-newclass-oversight-or-intentional/9277
   def replacePrimaryConstructor(
       cls: Symbol,
       clsDef: ClassDef,
@@ -47,6 +34,8 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
       body: Symbol => List[Statement]
   ): ClassDef =
     // It seems we have to use a really convoluted process to specify our own constructor.
+    val quotesImpl = quotes.asInstanceOf[scala.quoted.runtime.impl.QuotesImpl]
+    given dotty.tools.dotc.core.Contexts.Context = quotesImpl.ctx
     val DefDef(ctorName, _, _, _) = clsDef.constructor
     val ctorMethodType = MethodType(paramNames)(paramInfosExp, _ => cls.typeRef)
     val ctorSym = Symbol.newMethod(cls, ctorName, ctorMethodType, Flags.Synthetic, Symbol.noSymbol)
@@ -132,6 +121,7 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
           )
         )
       )
+    // TODO: Make this a value class.
     val cls = Symbol.newClass(Symbol.spliceOwner, name, parents.map(_.tpe), decls, selfType = None)
     val sourceParam = Ident(TermRef(This(cls).tpe, sourceParamName))
     // NOTE: Do not forget to put the symbol in the decls!
@@ -220,7 +210,7 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
       val result = tData match {
         case '[data] =>
           '{
-             ${unsafeToExpr(Block(stats = List(clsDef), expr = newCls))}.asInstanceOf[data]
+             ${Block(stats = List(clsDef), expr = newCls).asExpr}.asInstanceOf[data]
           }
       }
       println(result.show)
