@@ -4,16 +4,16 @@ import scala.language.reflectiveCalls
 
 //@experimental
 //@inspect
-class Data(source: Person) extends DataSource with Selectable {
+class MainData(source: Person) extends DataSource with Selectable {
   def selectDynamic(name: String): Any = name match {
     case "name" => source.name
   }
   def applyDynamic(name: String)(args: Any*): Any = name match {
-    case "withName" => new Data(source.copy(name = args.head.asInstanceOf[String]))
+    case "withName" => new MainData(source.copy(name = args.head.asInstanceOf[String]))
   }
 }
 
-type Ref = Data {
+type Ref = MainData {
   // Can we leave this abstract and refine it with "itself" later?
   // For example:
   //   type Ref = { type Self }
@@ -26,7 +26,7 @@ type Ref = Data {
   def withName(newName: String): this.type
 }
 
-def manualData(person: Person) = new Data(person).asInstanceOf[Ref]
+def manualData(person: Person) = new MainData(person).asInstanceOf[Ref]
 
 case class Person(name: String)
 
@@ -37,18 +37,19 @@ object Person:
   // TODO: Convert the other way.
   //given Conversion[Data, Person] = manualData
 
-@experimental
-@inspect
-object Container {
-  type Refine = {
-    def foo: this.type
-  }
-}
+//@experimental
+//@inspect
+//object Container {
+////  type Refine = {
+////    def foo: this.type
+////  }
+//  def foo: { def bar: this.type } = ???
+//}
 
 object Main extends App {
   val alice = data(Person("Alice"))
-  println(alice.name)
-  println(alice.withName("Bob").name)
+//  println(alice.name)
+//  println(alice.withName("Bob").name)
 
 //  println(new Data(Person("Alice")).asInstanceOf[Ref].name)
 //  println(new Data(Person("Alice")).asInstanceOf[Ref].withName("Bob").name)

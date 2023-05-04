@@ -80,21 +80,57 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
   end productFields
 
   def dataRefinementType(fields: Fields): TypeRepr =
+    val emptyIdent = dotty.tools.dotc.ast.untpd.EmptyTypeIdent.asInstanceOf[Ident]
+
+//    def refinementDecls(symbol: Symbol) =
+//      val thisTypeRepr = This(symbol).tpe
+//      fields.flatMap { (label, tpe) => List(
+//        // TODO: What should the flags be?
+//        Symbol.newVal(symbol, label, tpe, Flags.EmptyFlags, Symbol.noSymbol),
+//        Symbol.newMethod(symbol, s"with${label.capitalize}", thisTypeRepr, Flags.EmptyFlags, Symbol.noSymbol)
+//      )}
+//    val refinementSym = Symbol.newClass(Symbol.spliceOwner, "<refinement>", List(TypeRepr.of[Object]), refinementDecls, None)
+//      .asInstanceOf[dotty.tools.dotc.core.Symbols.ClassSymbol]
+//      .copy(flags = Flags.Trait.asInstanceOf[dotty.tools.dotc.core.Flags.FlagSet])
+//      .asInstanceOf[Symbol]
+
     fields.foldLeft(RecursiveType(_ => TypeRepr.of[DataSource])) {
       case (result, (label, tpe)) =>
         val resultWithField = Refinement(result, label, tpe)
+
         // FIXME: What type to use?
-//        val withResultType = result.recThis.binder
+
+        val withResultType = result.recThis
+
 // FIXME: Fails with dotty.tools.dotc.ast.Trees$UnAssignedTypeException: type of Ident() is not assigned
 //  I think this result type has to be Singleton(This(refinedClass))
 //  And refinedClass is some Template thing where the return type there is the EmptyTreeIdent
 //        val withResultType = Singleton(dotty.tools.dotc.ast.untpd.EmptyTypeIdent.asInstanceOf[Ident]).ref.tpe
+
+//        val withResultType = This(refinementSym).tpe
+
+//        val withResultType = Singleton(Ident(refinementSym.termRef)).ref.tpe
+
+//        val withResultType = This(emptyIdent).tpe
+
+//        val withResultType = unsafeToExpr(TypeTree)
+//
         val withMethodType = MethodType(List(label))(_ => List(tpe), _ => withResultType)
         // TODO: Ensure that there is no name conflict.
-        //  Make sure to keep the name in sync with the DefDef below.
+        //  Make sure to keep the name in sync with the DefDef above and below.
         val resultWithMethod = Refinement(resultWithField, s"with${label.capitalize}", withMethodType)
-        RecursiveType(_ => resultWithMethod)
+        RecursiveType { _ => resultWithMethod }
+
+//        RecursiveType { parentExp =>
+//          val withResultType = This(parentExp.termSymbol).tpe
+////          val withResultType = Singleton(Ident(parentExp.termSymbol.termRef)).ref.tpe
+//          val withMethodType = MethodType(List(label))(_ => List(tpe), _ => withResultType)
+//          // TODO: Ensure that there is no name conflict.
+//          //  Make sure to keep the name in sync with the DefDef above and below.
+//          Refinement(resultWithField, s"with${label.capitalize}", withMethodType)
+//        }
     }
+
   end dataRefinementType
 
   def dataClass(fields: Fields): (Symbol, ClassDef) =
