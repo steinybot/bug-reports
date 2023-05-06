@@ -1,4 +1,4 @@
-import scala.annotation.{experimental, tailrec}
+import scala.annotation.{experimental, nowarn, tailrec}
 // TODO: Get rid of this.
 import scala.compiletime.*
 import scala.deriving.Mirror
@@ -21,6 +21,10 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
 //  import quotes.reflect.*
 
   val LocalParamAccessor = Flags.Local | Flags.ParamAccessor | Flags.Private
+
+  // scala.annotation.{experimental, nowarn}
+  //val NoWarnSymbol = Symbol.unique(Symbol.unique(defn.ScalaPackage, "annotation"), "nowarn")
+  val NoWarn = TypeRepr.of[scala.annotation.nowarn].typeSymbol
 
   // TODO: Update the symbol before creating the initial ClassDef.
   // NOTE: Don't forget that any constructor parameters also need a ValDef if you want them to be accessible.
@@ -77,7 +81,13 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
       fields.foldLeft[TypeRepr](TypeRepr.of[DataSource]) {
         case (result, (label, tpe)) =>
           val resultWithField = Refinement(result, label, tpe)
-          val withResultType = recursiveType.recThis
+          val withResultType = AnnotatedType(
+            recursiveType.recThis,
+            // TODO: This could easily be abstracted.
+            // TODO: How do we apply the defaults?
+            //  See https://users.scala-lang.org/t/how-to-apply-no-args-a-termmethod-with-a-default-argument/9278
+            Select(New(TypeTree.ref(NoWarn)), NoWarn.primaryConstructor).appliedTo('{""}.asTerm)
+          )
           val withMethodType = MethodType(List(label))(_ => List(tpe), _ => withResultType)
           // TODO: Ensure that there is no name conflict.
           //  Make sure to keep the name in sync with the DefDef above and below.
@@ -164,8 +174,10 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
                     Select.unique(sourceParam, "copy"),
                     List(NamedArg(
                       label,
+                      // TODO: Use Term.appliedToType here.
                       TypeApply(
                         Select.unique(
+                          // TODO: Use Term.appliedTo here.
                           Apply(Select.unique(value.asExpr.asTerm, "apply"), List('{0}.asTerm)),
                           "asInstanceOf"
                         ),
