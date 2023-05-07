@@ -1,4 +1,5 @@
 ThisBuild / scalaVersion := "3.3.0-RC4"
+ThisBuild / scalacOptions ++= Seq("-explain", "-feature", "-language:implicitConversions")
 
 lazy val root = project.in(file("."))
   .aggregate(app, macros)

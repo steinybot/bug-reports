@@ -4,10 +4,92 @@ import scala.compiletime.*
 import scala.deriving.Mirror
 import scala.quoted.*
 
+// TODO: Make this a refinement on Null?
+trait TypeProvider {
+  type Type
+}
+
+transparent inline def dataType[T <: Product](using mirror: Mirror.ProductOf[T]) =
+  ${ dataTypeImpl[T]('mirror) }
+
+@experimental
+private def dataTypeImpl[T <: Product: Type](mirror: Expr[Mirror.ProductOf[T]])(using Quotes): Expr[Any] =
+  val quotesTyped: Quotes = quotes
+  import quotesTyped.reflect.*
+
+  type Fields = List[(String, TypeRepr)]
+
+  val NoWarn = TypeRepr.of[scala.annotation.nowarn].typeSymbol
+
+  def productFields[Labels <: Tuple : Type, Types <: Tuple : Type]: Fields =
+    @tailrec
+    def loop[Labels2 <: Tuple : Type, Types2 <: Tuple : Type](result: Fields): Fields =
+      Type.of[Labels2] match {
+        case '[EmptyTuple] => result
+        case '[tLabel *: tLabelTail] =>
+          Type.of[Types2] match {
+            case '[EmptyTuple] => result
+            case '[t *: tTail] =>
+              val label: String = Type.valueOfConstant[tLabel].get.toString
+              val tpe = TypeRepr.of[t]
+              loop[tLabelTail, tTail](label -> tpe :: result)
+          }
+      }
+
+    loop[Labels, Types](Nil).reverse
+  end productFields
+
+  def dataRefinementType(fields: Fields): TypeRepr =
+    RecursiveType { recursiveType =>
+      fields.foldLeft[TypeRepr](TypeRepr.of[DataSource]) {
+        case (result, (label, tpe)) =>
+          val resultWithField = Refinement(result, label, tpe)
+          val withResultType = AnnotatedType(
+            recursiveType.recThis,
+            // TODO: This could easily be abstracted.
+            // TODO: How do we apply the defaults?
+            //  See https://users.scala-lang.org/t/how-to-apply-no-args-a-termmethod-with-a-default-argument/9278
+            Select(New(TypeTree.ref(NoWarn)), NoWarn.primaryConstructor).appliedTo('{ "" }.asTerm)
+          )
+          val withMethodType = MethodType(List(label))(_ => List(tpe), _ => withResultType)
+          // TODO: Ensure that there is no name conflict.
+          //  Make sure to keep the name in sync with the DefDef above and below.
+          Refinement(resultWithField, s"with${label.capitalize}", withMethodType)
+      }
+    }
+  end dataRefinementType
+
+  mirror match
+    case '{
+      type mels <: Tuple
+      type mets <: Tuple
+      $m: Mirror.ProductOf[T] {
+        type MirroredElemLabels = `mels`
+        type MirroredElemTypes = `mets`
+      }
+    } =>
+      val fields = productFields[mels, mets]
+      val tData = dataRefinementType(fields).asType
+      val result = tData match {
+        case '[data] =>
+          '{
+            new TypeProvider {
+              type Type = data
+            }
+          }
+      }
+      println(result.show)
+      result
+    case other =>
+      println(other.show)
+      report.errorAndAbort("Unexpected Mirror.ProductOf", other)
+
 // TODO: Tidy up syntax.
 trait DataSource extends Selectable {
   // These need to be visible members of the result otherwise if fails to compile, saying that they are not a member.
   def selectDynamic(name: String): Any
+  // TODO: Make this more generic.
+  //def applyDynamic(name: String, paramClasses: Class[_]*)(args: Any*): Any
   def applyDynamic(name: String)(args: Any*): Any
 }
 
@@ -94,7 +176,6 @@ private def dataImpl[T: Type](source: Expr[T])(using Quotes): Expr[Any] =
           Refinement(resultWithField, s"with${label.capitalize}", withMethodType)
       }
     }
-
   end dataRefinementType
 
   def dataClass(fields: Fields): (Symbol, ClassDef) =
