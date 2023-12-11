@@ -1,0 +1,40 @@
+package web.typings.std
+
+import org.scalablytyped.runtime.StObject
+import scala.scalajs.js
+import scala.scalajs.js.`|`
+import scala.scalajs.js.annotation.{JSGlobalScope, JSGlobal, JSImport, JSName, JSBracketAccess}
+
+@js.native
+trait RTCRtcpFeedback extends StObject {
+  
+  /* standard dom */
+  var parameter: js.UndefOr[java.lang.String] = js.native
+  
+  /* standard dom */
+  var `type`: js.UndefOr[java.lang.String] = js.native
+}
+object RTCRtcpFeedback {
+  
+  @scala.inline
+  def apply(): RTCRtcpFeedback = {
+    val __obj = js.Dynamic.literal()
+    __obj.asInstanceOf[RTCRtcpFeedback]
+  }
+  
+  @scala.inline
+  implicit class MutableBuilder[Self <: RTCRtcpFeedback] (val x: Self) extends AnyVal {
+    
+    @scala.inline
+    def setParameter(value: java.lang.String): Self = StObject.set(x, "parameter", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setParameterUndefined: Self = StObject.set(x, "parameter", js.undefined)
+    
+    @scala.inline
+    def setType(value: java.lang.String): Self = StObject.set(x, "type", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setTypeUndefined: Self = StObject.set(x, "type", js.undefined)
+  }
+}

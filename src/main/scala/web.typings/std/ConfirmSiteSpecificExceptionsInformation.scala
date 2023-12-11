@@ -1,0 +1,36 @@
+package web.typings.std
+
+import org.scalablytyped.runtime.StObject
+import scala.scalajs.js
+import scala.scalajs.js.`|`
+import scala.scalajs.js.annotation.{JSGlobalScope, JSGlobal, JSImport, JSName, JSBracketAccess}
+
+@js.native
+trait ConfirmSiteSpecificExceptionsInformation
+  extends StObject
+     with ExceptionInformation {
+  
+  /* standard dom */
+  var arrayOfDomainStrings: js.UndefOr[js.Array[java.lang.String]] = js.native
+}
+object ConfirmSiteSpecificExceptionsInformation {
+  
+  @scala.inline
+  def apply(): ConfirmSiteSpecificExceptionsInformation = {
+    val __obj = js.Dynamic.literal()
+    __obj.asInstanceOf[ConfirmSiteSpecificExceptionsInformation]
+  }
+  
+  @scala.inline
+  implicit class MutableBuilder[Self <: ConfirmSiteSpecificExceptionsInformation] (val x: Self) extends AnyVal {
+    
+    @scala.inline
+    def setArrayOfDomainStrings(value: js.Array[java.lang.String]): Self = StObject.set(x, "arrayOfDomainStrings", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setArrayOfDomainStringsUndefined: Self = StObject.set(x, "arrayOfDomainStrings", js.undefined)
+    
+    @scala.inline
+    def setArrayOfDomainStringsVarargs(value: java.lang.String*): Self = StObject.set(x, "arrayOfDomainStrings", js.Array(value :_*))
+  }
+}

@@ -1,0 +1,34 @@
+package web.typings.std
+
+import org.scalablytyped.runtime.StObject
+import scala.scalajs.js
+import scala.scalajs.js.`|`
+import scala.scalajs.js.annotation.{JSGlobalScope, JSGlobal, JSImport, JSName, JSBracketAccess}
+
+@js.native
+trait SpeechRecognitionAlternative extends StObject {
+  
+  /* standard dom */
+  val confidence: Double = js.native
+  
+  /* standard dom */
+  val transcript: java.lang.String = js.native
+}
+object SpeechRecognitionAlternative {
+  
+  @scala.inline
+  def apply(confidence: Double, transcript: java.lang.String): SpeechRecognitionAlternative = {
+    val __obj = js.Dynamic.literal(confidence = confidence.asInstanceOf[js.Any], transcript = transcript.asInstanceOf[js.Any])
+    __obj.asInstanceOf[SpeechRecognitionAlternative]
+  }
+  
+  @scala.inline
+  implicit class MutableBuilder[Self <: SpeechRecognitionAlternative] (val x: Self) extends AnyVal {
+    
+    @scala.inline
+    def setConfidence(value: Double): Self = StObject.set(x, "confidence", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setTranscript(value: java.lang.String): Self = StObject.set(x, "transcript", value.asInstanceOf[js.Any])
+  }
+}

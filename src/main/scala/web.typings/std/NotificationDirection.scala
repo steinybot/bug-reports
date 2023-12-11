@@ -1,0 +1,24 @@
+package web.typings.std
+
+import org.scalablytyped.runtime.StObject
+import scala.scalajs.js
+import scala.scalajs.js.`|`
+import scala.scalajs.js.annotation.{JSGlobalScope, JSGlobal, JSImport, JSName, JSBracketAccess}
+
+/* Rewritten from type alias, can be one of: 
+  - `web.typings`.std.stdStrings.auto
+  - `web.typings`.std.stdStrings.ltr
+  - `web.typings`.std.stdStrings.rtl
+*/
+trait NotificationDirection extends StObject
+object NotificationDirection {
+  
+  @scala.inline
+  def auto: web.typings.std.stdStrings.auto = "auto".asInstanceOf[web.typings.std.stdStrings.auto]
+  
+  @scala.inline
+  def ltr: web.typings.std.stdStrings.ltr = "ltr".asInstanceOf[web.typings.std.stdStrings.ltr]
+  
+  @scala.inline
+  def rtl: web.typings.std.stdStrings.rtl = "rtl".asInstanceOf[web.typings.std.stdStrings.rtl]
+}

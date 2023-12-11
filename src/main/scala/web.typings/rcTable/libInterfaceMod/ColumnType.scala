@@ -1,0 +1,110 @@
+package web.typings.rcTable.libInterfaceMod
+
+import web.typings.react.mod.HTMLAttributes
+import web.typings.react.mod.TdHTMLAttributes
+import org.scalajs.dom.HTMLElement
+import slinky.core.facade.ReactElement
+import slinky.web.SyntheticMouseEvent
+import org.scalablytyped.runtime.StObject
+import scala.scalajs.js
+import scala.scalajs.js.`|`
+import scala.scalajs.js.annotation.{JSGlobalScope, JSGlobal, JSImport, JSName, JSBracketAccess}
+
+@js.native
+trait ColumnType[RecordType]
+  extends StObject
+     with ColumnSharedType[RecordType] {
+  
+  var colSpan: js.UndefOr[Double] = js.native
+  
+  var dataIndex: js.UndefOr[DataIndex] = js.native
+  
+  var onCell: js.UndefOr[GetComponentProps[RecordType]] = js.native
+  
+  /** @deprecated Please use `onCell` instead */
+  var onCellClick: js.UndefOr[
+    js.Function2[/* record */ RecordType, /* e */ SyntheticMouseEvent[HTMLElement], Unit]
+  ] = js.native
+  
+  var render: js.UndefOr[
+    js.Function3[
+      /* value */ Any, 
+      /* record */ RecordType, 
+      /* index */ Double, 
+      ReactElement | RenderedCell[RecordType]
+    ]
+  ] = js.native
+  
+  var rowSpan: js.UndefOr[Double] = js.native
+  
+  var shouldCellUpdate: js.UndefOr[js.Function2[/* record */ RecordType, /* prevRecord */ RecordType, Boolean]] = js.native
+  
+  var width: js.UndefOr[Double | String] = js.native
+}
+object ColumnType {
+  
+  @scala.inline
+  def apply[RecordType](): ColumnType[RecordType] = {
+    val __obj = js.Dynamic.literal()
+    __obj.asInstanceOf[ColumnType[RecordType]]
+  }
+  
+  @scala.inline
+  implicit class MutableBuilder[Self <: ColumnType[_], RecordType] (val x: Self with ColumnType[RecordType]) extends AnyVal {
+    
+    @scala.inline
+    def setColSpan(value: Double): Self = StObject.set(x, "colSpan", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setColSpanUndefined: Self = StObject.set(x, "colSpan", js.undefined)
+    
+    @scala.inline
+    def setDataIndex(value: DataIndex): Self = StObject.set(x, "dataIndex", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setDataIndexUndefined: Self = StObject.set(x, "dataIndex", js.undefined)
+    
+    @scala.inline
+    def setDataIndexVarargs(value: (String | Double)*): Self = StObject.set(x, "dataIndex", js.Array(value :_*))
+    
+    @scala.inline
+    def setOnCell(
+      value: (RecordType, /* index */ js.UndefOr[Double]) => HTMLAttributes[Any] with TdHTMLAttributes[Any]
+    ): Self = StObject.set(x, "onCell", js.Any.fromFunction2(value))
+    
+    @scala.inline
+    def setOnCellClick(value: (/* record */ RecordType, /* e */ SyntheticMouseEvent[HTMLElement]) => Unit): Self = StObject.set(x, "onCellClick", js.Any.fromFunction2(value))
+    
+    @scala.inline
+    def setOnCellClickUndefined: Self = StObject.set(x, "onCellClick", js.undefined)
+    
+    @scala.inline
+    def setOnCellUndefined: Self = StObject.set(x, "onCell", js.undefined)
+    
+    @scala.inline
+    def setRender(
+      value: (/* value */ Any, /* record */ RecordType, /* index */ Double) => ReactElement | RenderedCell[RecordType]
+    ): Self = StObject.set(x, "render", js.Any.fromFunction3(value))
+    
+    @scala.inline
+    def setRenderUndefined: Self = StObject.set(x, "render", js.undefined)
+    
+    @scala.inline
+    def setRowSpan(value: Double): Self = StObject.set(x, "rowSpan", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setRowSpanUndefined: Self = StObject.set(x, "rowSpan", js.undefined)
+    
+    @scala.inline
+    def setShouldCellUpdate(value: (/* record */ RecordType, /* prevRecord */ RecordType) => Boolean): Self = StObject.set(x, "shouldCellUpdate", js.Any.fromFunction2(value))
+    
+    @scala.inline
+    def setShouldCellUpdateUndefined: Self = StObject.set(x, "shouldCellUpdate", js.undefined)
+    
+    @scala.inline
+    def setWidth(value: Double | String): Self = StObject.set(x, "width", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setWidthUndefined: Self = StObject.set(x, "width", js.undefined)
+  }
+}

@@ -1,0 +1,91 @@
+package web.typings.antd.anon
+
+import web.typings.antd.esFormFormItemLabelMod.LabelTooltipType
+import web.typings.antd.esFormInterfaceMod.FormLabelAlign
+import web.typings.antd.esGridColMod.ColProps
+import slinky.core.facade.ReactElement
+import org.scalablytyped.runtime.StObject
+import scala.scalajs.js
+import scala.scalajs.js.`|`
+import scala.scalajs.js.annotation.{JSGlobalScope, JSGlobal, JSImport, JSName, JSBracketAccess}
+
+/* Inlined antd.antd/es/form/FormItemLabel.FormItemLabelProps & {  required :boolean | undefined,   prefixCls :string} */
+@js.native
+trait FormItemLabelPropsrequire extends StObject {
+  
+  var colon: js.UndefOr[Boolean] = js.native
+  
+  var htmlFor: js.UndefOr[String] = js.native
+  
+  var label: js.UndefOr[ReactElement] = js.native
+  
+  var labelAlign: js.UndefOr[FormLabelAlign] = js.native
+  
+  var labelCol: js.UndefOr[ColProps] = js.native
+  
+  var prefixCls: String = js.native
+  
+  var required: js.UndefOr[Boolean] = js.native
+  
+  var tooltip: js.UndefOr[LabelTooltipType] = js.native
+}
+object FormItemLabelPropsrequire {
+  
+  @scala.inline
+  def apply(prefixCls: String): FormItemLabelPropsrequire = {
+    val __obj = js.Dynamic.literal(prefixCls = prefixCls.asInstanceOf[js.Any])
+    __obj.asInstanceOf[FormItemLabelPropsrequire]
+  }
+  
+  @scala.inline
+  implicit class MutableBuilder[Self <: FormItemLabelPropsrequire] (val x: Self) extends AnyVal {
+    
+    @scala.inline
+    def setColon(value: Boolean): Self = StObject.set(x, "colon", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setColonUndefined: Self = StObject.set(x, "colon", js.undefined)
+    
+    @scala.inline
+    def setHtmlFor(value: String): Self = StObject.set(x, "htmlFor", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setHtmlForUndefined: Self = StObject.set(x, "htmlFor", js.undefined)
+    
+    @scala.inline
+    def setLabel(value: ReactElement): Self = StObject.set(x, "label", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setLabelAlign(value: FormLabelAlign): Self = StObject.set(x, "labelAlign", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setLabelAlignUndefined: Self = StObject.set(x, "labelAlign", js.undefined)
+    
+    @scala.inline
+    def setLabelCol(value: ColProps): Self = StObject.set(x, "labelCol", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setLabelColUndefined: Self = StObject.set(x, "labelCol", js.undefined)
+    
+    @scala.inline
+    def setLabelUndefined: Self = StObject.set(x, "label", js.undefined)
+    
+    @scala.inline
+    def setPrefixCls(value: String): Self = StObject.set(x, "prefixCls", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setRequired(value: Boolean): Self = StObject.set(x, "required", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setRequiredUndefined: Self = StObject.set(x, "required", js.undefined)
+    
+    @scala.inline
+    def setTooltip(value: LabelTooltipType): Self = StObject.set(x, "tooltip", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setTooltipReactElement(value: ReactElement): Self = StObject.set(x, "tooltip", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setTooltipUndefined: Self = StObject.set(x, "tooltip", js.undefined)
+  }
+}

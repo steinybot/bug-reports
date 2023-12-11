@@ -1,0 +1,67 @@
+package web.typings.std
+
+import org.scalablytyped.runtime.StObject
+import scala.scalajs.js
+import scala.scalajs.js.`|`
+import scala.scalajs.js.annotation.{JSGlobalScope, JSGlobal, JSImport, JSName, JSBracketAccess}
+
+@js.native
+trait RTCSrtpKeyParam extends StObject {
+  
+  /* standard dom */
+  var keyMethod: js.UndefOr[java.lang.String] = js.native
+  
+  /* standard dom */
+  var keySalt: js.UndefOr[java.lang.String] = js.native
+  
+  /* standard dom */
+  var lifetime: js.UndefOr[java.lang.String] = js.native
+  
+  /* standard dom */
+  var mkiLength: js.UndefOr[Double] = js.native
+  
+  /* standard dom */
+  var mkiValue: js.UndefOr[Double] = js.native
+}
+object RTCSrtpKeyParam {
+  
+  @scala.inline
+  def apply(): RTCSrtpKeyParam = {
+    val __obj = js.Dynamic.literal()
+    __obj.asInstanceOf[RTCSrtpKeyParam]
+  }
+  
+  @scala.inline
+  implicit class MutableBuilder[Self <: RTCSrtpKeyParam] (val x: Self) extends AnyVal {
+    
+    @scala.inline
+    def setKeyMethod(value: java.lang.String): Self = StObject.set(x, "keyMethod", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setKeyMethodUndefined: Self = StObject.set(x, "keyMethod", js.undefined)
+    
+    @scala.inline
+    def setKeySalt(value: java.lang.String): Self = StObject.set(x, "keySalt", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setKeySaltUndefined: Self = StObject.set(x, "keySalt", js.undefined)
+    
+    @scala.inline
+    def setLifetime(value: java.lang.String): Self = StObject.set(x, "lifetime", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setLifetimeUndefined: Self = StObject.set(x, "lifetime", js.undefined)
+    
+    @scala.inline
+    def setMkiLength(value: Double): Self = StObject.set(x, "mkiLength", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setMkiLengthUndefined: Self = StObject.set(x, "mkiLength", js.undefined)
+    
+    @scala.inline
+    def setMkiValue(value: Double): Self = StObject.set(x, "mkiValue", value.asInstanceOf[js.Any])
+    
+    @scala.inline
+    def setMkiValueUndefined: Self = StObject.set(x, "mkiValue", js.undefined)
+  }
+}
