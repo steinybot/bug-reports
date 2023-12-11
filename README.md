@@ -1,6 +1,6 @@
 # Bug Reports
 
-This reproduces the bug for https://github.com/ScalablyTyped/Converter/issues/584.
+This reproduces the bug for https://github.com/ScalablyTyped/Converter/issues/588.
 
 ## Steps to Reproduce
 
