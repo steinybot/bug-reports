@@ -1,6 +1,6 @@
 import org.scalajs.linker.interface.ModuleSplitStyle
 
-enablePlugins(ScalaJSPlugin)
+enablePlugins(ScalaJSPlugin, ScalablyTypedConverterExternalNpmPlugin)
 
 scalaVersion := "3.3.1"
 
@@ -17,3 +17,5 @@ scalaJSLinkerConfig ~= {
 }
 
 libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "2.4.0"
+
+externalNpm := baseDirectory.value
