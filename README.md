@@ -7,5 +7,6 @@ This reproduces the bug for TODO.
 
 ## Steps to Reproduce
 
+1. `npm install`
 1. `sbt ~fastLinkJS`
-1. `npm install && npm run dev`
+1. `npm run dev`
