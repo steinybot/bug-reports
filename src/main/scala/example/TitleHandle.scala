@@ -6,7 +6,7 @@ import scala.scalajs.js
 import scala.scalajs.js.UndefOr
 
 trait TitleHandle extends js.Object {
-  def title(m: UIMatch[Any, Any]): UndefOr[String]
+  def title(): UndefOr[String]
 }
 
 object TitleHandle {

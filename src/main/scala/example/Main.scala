@@ -16,5 +16,5 @@ object Main extends App {
 
   val handle = AllPages.FnolPage.handle
   val titleHandle = TitleHandle.fromAny(handle)
-  println(titleHandle.get.title(null))
+  println(titleHandle.get.title())
 }
