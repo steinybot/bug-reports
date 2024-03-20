@@ -5,7 +5,17 @@ import example.Options.combineObjects
 import scala.scalajs.js
 import scala.scalajs.js.UndefOr
 
-trait AllPages extends BaseRoute
+trait AllPages {
+
+  val title: UndefOr[String] = js.undefined
+
+  def handle: Any = {
+    val routeTitle = title
+    new TitleHandle {
+      override def title(m: UIMatch[Any, Any]): UndefOr[String] = routeTitle
+    }
+  }
+}
 
 object AllPages {
 
