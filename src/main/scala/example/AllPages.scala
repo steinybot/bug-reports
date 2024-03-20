@@ -3,25 +3,20 @@ package example
 import scala.scalajs.js
 import scala.scalajs.js.UndefOr
 
-trait AllPages {
-
-  val title: UndefOr[String] = js.undefined
-
-  def handle: Any = {
-    val routeTitle = title
-    new TitleHandle {
-      override def title(): UndefOr[String] = routeTitle
-    }
-  }
-}
-
 object AllPages {
 
-  case object FnolPage extends AllPages {
-    override val title: UndefOr[String] = "File a claim"
+  case object FnolPage {
+    val title: UndefOr[String] = "File a claim"
 
-    override def handle: Any = {
-      val handle               = super.handle.asInstanceOf[js.Object]
+    def superHandle = {
+      val routeTitle = title
+      new TitleHandle {
+        override def title(): UndefOr[String] = routeTitle
+      }
+    }
+
+    def handle: Any = {
+      val handle               = superHandle.asInstanceOf[js.Object]
 
       def combineObjects[A <: js.Object, B <: js.Object](first: A, second: B): A with B = {
         val result = js.Object.assign(js.Dynamic.literal(), first, second)
