@@ -8,11 +8,9 @@ trait TitleHandle extends js.Object {
 }
 
 object Page {
-  val title: UndefOr[String] = "File a claim"
-
   def handle: Any = {
     // Inlining this fixes the problem.
-    val routeTitle = title
+    val routeTitle = "My page"
     val handle = new TitleHandle {
       override def title(): UndefOr[String] = routeTitle
     }
