@@ -10,6 +10,6 @@ object Main extends App {
 //  TitleHandle.fromAny(combination).foreach(h => println(h.title(null)))
 
   val handle = AllPages.FnolPage.handle
-  val titleHandle = TitleHandle.fromAny(handle)
-  println(titleHandle.get.title())
+  val titleHandle = handle.asInstanceOf[TitleHandle]
+  println(titleHandle.title())
 }
