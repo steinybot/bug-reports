@@ -1,10 +1,5 @@
 package example
 
-import example.Options.combineObjects
-
-import scala.scalajs.js
-import scala.scalajs.js.UndefOr
-
 object Main extends App {
 
 //  val titleHandle = new TitleHandle {
