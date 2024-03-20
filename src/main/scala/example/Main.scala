@@ -22,15 +22,5 @@ object Page {
 }
 
 object Main extends App {
-
-  //  val titleHandle = new TitleHandle {
-  //    override def title(m: UIMatch[Any, Any]): UndefOr[String] = "My Title"
-  //  }
-  //  val freshchatHandle = FreshchatHandle(js.Array("claims-page"))
-  //  val combination =  combineObjects[js.Object, FreshchatHandle](titleHandle.asInstanceOf[js.Object], freshchatHandle)
-  //  TitleHandle.fromAny(combination).foreach(h => println(h.title(null)))
-
-  val handle = Page.handle
-  val titleHandle = handle.asInstanceOf[TitleHandle]
-  println(titleHandle.title())
+  println(Page.handle.asInstanceOf[TitleHandle].title())
 }
