@@ -1,24 +1,23 @@
 package example
 
 import scala.scalajs.js
-import scala.scalajs.js.UndefOr
 
 trait TitleHandle extends js.Object {
-  def title(): UndefOr[String]
+  def title(): String
 }
 
-object Page {
-  def handle: Any = {
+object Main extends App {
+
+  val handle = {
     // Inlining this fixes the problem.
+    // Moving it out of the current block scope also fixes the problem.
     val routeTitle = "My page"
     val handle = new TitleHandle {
-      override def title(): UndefOr[String] = routeTitle
+      override def title(): String = routeTitle
     }
     // This causes the private symbols to be lost. It is a js.Object though so JavaScript semantics should apply.
     js.Object.assign(js.Object(), handle)
   }
-}
 
-object Main extends App {
-  println(Page.handle.asInstanceOf[TitleHandle].title())
+  println(handle.asInstanceOf[TitleHandle].title())
 }
