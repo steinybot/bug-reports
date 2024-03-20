@@ -4,8 +4,6 @@ enablePlugins(ScalaJSPlugin)
 
 scalaVersion := "2.13.13"
 
-scalacOptions += "-Ymacro-annotations"
-
 scalaJSUseMainModuleInitializer := true
 
 // Configure Scala.js to emit modules in the optimal way to connect to Vite's incremental reload.
@@ -19,6 +17,5 @@ scalaJSLinkerConfig ~= {
 }
 
 libraryDependencies ++= Seq(
-  "me.shadaj" %%% "slinky-core" % "0.7.4",
   "org.scala-js" %%% "scalajs-dom" % "2.4.0"
 )
