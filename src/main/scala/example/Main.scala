@@ -14,7 +14,7 @@ object Main extends App {
 //  val combination =  combineObjects[js.Object, FreshchatHandle](titleHandle.asInstanceOf[js.Object], freshchatHandle)
 //  TitleHandle.fromAny(combination).foreach(h => println(h.title(null)))
 
-  val handle = AllPages.FnolPage.config.asInstanceOf[EntryPointIndexRouteObject].handle.get
+  val handle = AllPages.FnolPage.handle
   val titleHandle = TitleHandle.fromAny(handle)
   println(titleHandle.get.title(null))
 }

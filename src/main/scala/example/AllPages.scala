@@ -18,13 +18,11 @@ object AllPages {
     override val path: UndefOr[String]                                = "claim/new"
 //    override val entryPoint: RelayEntryPoint[_]                       = FileAClaimViewEntryPoint
 
-    override def config: EntryPointRouteObject = {
-      val c               = super.config.asInstanceOf[EntryPointIndexRouteObject]
+    override def handle: Any = {
+      val handle               = super.handle.asInstanceOf[js.Object]
       // @Note Configured here: https://web.freshchat.com/a/121288663858798/settings/channels
       val freshchatHandle = FreshchatHandle(js.Array("claims-page"))
-      c.setHandle(c.handle.fold(freshchatHandle)(handle => {
-        combineObjects[js.Object, FreshchatHandle](handle.asInstanceOf[js.Object], freshchatHandle)
-      }))
+      combineObjects[js.Object, FreshchatHandle](handle, freshchatHandle)
     }
   }
 

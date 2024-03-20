@@ -1,6 +1,5 @@
 package example
 
-import example.BuilderSyntax.BuilderOps
 import slinky.core.facade.ReactElement
 
 import scala.scalajs.js
@@ -32,24 +31,13 @@ trait BaseRoute {
 
   val errorElement: ReactElement = null
 
-//  val action: UndefOr[ActionFunctionArgs[Any] => js.Promise[DataFunctionValue]] = js.undefined
+  //  val action: UndefOr[ActionFunctionArgs[Any] => js.Promise[DataFunctionValue]] = js.undefined
 
-  def config: EntryPointRouteObject = {
-    IndexRouteObject()
-      .setIfDefined(path)(_.setPath)
-      .setErrorElement(errorElement)
-//      .setIfDefined(action)(config =>
-//        action =>
-//          config.setAction(
-//            action.asInstanceOf[ActionFunctionArgs[Any] => js.Promise[DataFunctionValue] | DataFunctionValue]
-//          )
-//      )
-      .setIfDefined(title)(config =>
-        routeTitle =>
-          config.setHandle(new TitleHandle {
-            override def title(m: UIMatch[Any, Any]): UndefOr[String] = routeTitle
-          })
-      )
+  def handle: Any = {
+    val routeTitle = title
+    new TitleHandle {
+      override def title(m: UIMatch[Any, Any]): UndefOr[String] = routeTitle
+    }
   }
 }
 
