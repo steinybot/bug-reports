@@ -2,7 +2,9 @@ import org.scalajs.linker.interface.ModuleSplitStyle
 
 enablePlugins(ScalaJSPlugin)
 
-scalaVersion := "3.3.1"
+scalaVersion := "2.13.13"
+
+scalacOptions += "-Ymacro-annotations"
 
 scalaJSUseMainModuleInitializer := true
 
@@ -16,4 +18,7 @@ scalaJSLinkerConfig ~= {
       ModuleSplitStyle.SmallModulesFor(List("example")))
 }
 
-libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "2.4.0"
+libraryDependencies ++= Seq(
+  "me.shadaj" %%% "slinky-core" % "0.7.4",
+  "org.scala-js" %%% "scalajs-dom" % "2.4.0"
+)
