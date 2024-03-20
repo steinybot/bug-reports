@@ -10,7 +10,7 @@ trait BaseRoute {
 
   val parent: UndefOr[BaseRoute]
 
-  val title: UndefOr[UIMatch[Any, Any] => UndefOr[String]] = js.undefined
+  val title: UndefOr[String] = js.undefined
 
   /** Path relative to the parent without a leading slash.
    *
@@ -47,7 +47,7 @@ trait BaseRoute {
       .setIfDefined(title)(config =>
         routeTitle =>
           config.setHandle(new TitleHandle {
-            override def title(m: UIMatch[Any, Any]): UndefOr[String] = routeTitle(m)
+            override def title(m: UIMatch[Any, Any]): UndefOr[String] = routeTitle
           })
       )
   }

@@ -14,7 +14,7 @@ object AllPages {
   case object FnolPage extends AllPages {
 //    override val parent: UndefOr[BaseRoute]                           = DashboardLayout().Center
     override val parent: UndefOr[BaseRoute]                           = js.undefined
-    override val title: UndefOr[UIMatch[Any, Any] => UndefOr[String]] = staticTitle("File a claim")
+    override val title: UndefOr[String] = "File a claim"
     override val path: UndefOr[String]                                = "claim/new"
 //    override val entryPoint: RelayEntryPoint[_]                       = FileAClaimViewEntryPoint
 
