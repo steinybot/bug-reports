@@ -14,13 +14,8 @@ object AllPages {
       val handle = new TitleHandle {
         override def title(): UndefOr[String] = routeTitle
       }
-
-      def combineObjects[A <: js.Object, B <: js.Object](first: A, second: B): A with B = {
-        val result = js.Object.assign(js.Dynamic.literal(), first, second)
-        result.asInstanceOf[A with B]
-      }
-
-      combineObjects[js.Object, js.Object](handle, js.Object())
+      // This causes the private symbols to be lost. It is a js.Object though so JavaScript semantics should apply.
+      js.Object.assign(js.Object(), handle)
     }
   }
 }
