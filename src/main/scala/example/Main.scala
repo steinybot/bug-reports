@@ -16,8 +16,8 @@ object Main extends App {
       override def title(): String = routeTitle
     }
     // This causes the private symbols to be lost. It is a js.Object though so JavaScript semantics should apply.
-    js.Object.assign(js.Object(), handle)
+    js.Object.assign(js.Object(), handle).asInstanceOf[TitleHandle]
   }
 
-  println(handle.asInstanceOf[TitleHandle].title())
+  println(handle.title())
 }
