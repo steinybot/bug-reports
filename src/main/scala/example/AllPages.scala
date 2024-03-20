@@ -8,15 +8,11 @@ object AllPages {
   case object FnolPage {
     val title: UndefOr[String] = "File a claim"
 
-    def superHandle = {
-      val routeTitle = title
-      new TitleHandle {
-        override def title(): UndefOr[String] = routeTitle
-      }
-    }
-
     def handle: Any = {
-      val handle               = superHandle.asInstanceOf[js.Object]
+      val routeTitle = title
+      val handle = new TitleHandle {
+        override def title(): UndefOr[String] = routeTitle
+      }.asInstanceOf[js.Object]
 
       def combineObjects[A <: js.Object, B <: js.Object](first: A, second: B): A with B = {
         val result = js.Object.assign(js.Dynamic.literal(), first, second)
