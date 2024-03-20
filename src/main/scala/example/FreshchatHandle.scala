@@ -1,6 +1,5 @@
 package example
 
-import example.AnySyntax._
 import example.FreshchatHandle.FreshchatConfig
 
 import scala.scalajs.js
@@ -26,5 +25,5 @@ object FreshchatHandle {
   }
 
   def fromAny(any: Any): UndefOr[FreshchatHandle] =
-    if (any.?.freshchat.toObject.isDefined) any.asInstanceOf[FreshchatHandle] else js.undefined
+    any.asInstanceOf[FreshchatHandle]
 }
