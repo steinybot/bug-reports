@@ -9,10 +9,11 @@ object AllPages {
     val title: UndefOr[String] = "File a claim"
 
     def handle: Any = {
+      // Inlining this fixes the problem.
       val routeTitle = title
       val handle = new TitleHandle {
         override def title(): UndefOr[String] = routeTitle
-      }.asInstanceOf[js.Object]
+      }
 
       def combineObjects[A <: js.Object, B <: js.Object](first: A, second: B): A with B = {
         val result = js.Object.assign(js.Dynamic.literal(), first, second)
