@@ -9,7 +9,6 @@ trait AllPages extends BaseRoute
 
 object AllPages {
 
-//  case object FnolPage extends AllPages with StaticRoute with RelayRoute {
   case object FnolPage extends AllPages {
     override val title: UndefOr[String] = "File a claim"
 
